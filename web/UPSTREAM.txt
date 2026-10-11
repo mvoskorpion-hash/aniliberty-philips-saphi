@@ -1,0 +1,5 @@
+Source: https://github.com/CoreDip/anilibria-tizen-wgt
+Commit: d027ab80c83ee9eed22251e47e5db759d4bff0f3
+Upstream README declares MIT; repository contains no standalone LICENSE.
+Adaptation: Philips SAPHI, remote keys, legacy JS/CSS, MSX local launcher.
+Bundled dependencies retain their license notices; core-js MIT, whatwg-fetch MIT, hls.js Apache-2.0.
