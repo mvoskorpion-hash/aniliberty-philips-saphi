@@ -3108,8 +3108,7 @@ function _loadVideo(url, startTime, ep) {
     hlsInst.attachMedia(v);
     hlsInst.on(Hls.Events.MANIFEST_PARSED, function () {
       if (startTime > 5) v.currentTime = startTime;
-      var playing = v.play();
-      if (playing && playing.catch) playing.catch(function () {});
+      philipsPlay(v);
       $('plySpin').style.display = 'none';
     });
     hlsInst.on(Hls.Events.ERROR, function (_, d) {
@@ -3135,8 +3134,7 @@ function _loadVideo(url, startTime, ep) {
         };
         v.addEventListener('canplay', _doSeek);
       }
-      var playing = v.play();
-      if (playing && playing.catch) playing.catch(function () {});
+      philipsPlay(v);
       $('plySpin').style.display = 'none';
     };
     v.addEventListener('loadedmetadata', _onReady);
@@ -3432,7 +3430,7 @@ function togglePlay() {
   var v = $('vid'),
     ico = $('pcPlayIco');
   if (v.paused) {
-    v.play();
+    philipsPlay(v);
     if (ico) ico.innerHTML = '<path d="M6 19h4V5H6zm8-14v14h4V5z"/>'; // pause
   } else {
     v.pause();
@@ -3629,7 +3627,7 @@ function _seekAccel(dir) {
     _seekDir = 0;
     _seekCount = 0;
     if (_seekPausedByUs) {
-      v.play();
+      philipsPlay(v);
       _seekPausedByUs = false;
     }
   }, 700);
@@ -3760,7 +3758,7 @@ $('plyOv').addEventListener('click', function (e) {
     bar.classList.remove('scrubbing');
     applySeek(pctFromEvent(e));
     if (_scrubbingWasPlaying) {
-      $('vid').play();
+      philipsPlay($('vid'));
       _scrubbingWasPlaying = false;
     }
   }
@@ -4415,8 +4413,7 @@ function handleKey(e) {
   // Always available: Tizen media keys
   if (k === 'MediaPlay') {
     if (Z === 'player') {
-      var p = $('vid').play();
-      if (p && p.catch) p.catch(function () {});
+      philipsPlay($('vid'));
       e.preventDefault();
     }
     return;

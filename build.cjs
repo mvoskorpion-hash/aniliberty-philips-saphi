@@ -22,7 +22,10 @@ const _isTizen=_isSamsung||_isPhilips;`);
  html=html.replace("if(_isTizen||typeof Hls!=='undefined'){ cb(); return; }", "if(_isSamsung||$('vid').canPlayType('application/vnd.apple.mpegurl')||typeof Hls!=='undefined'){ cb(); return; }");
  html=html.replace("s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js';", "s.src='js/hls.min.js';\n  s.onerror=()=>{ cb(); };");
  html=html.replace("if(!isTizen && typeof Hls!=='undefined' && Hls.isSupported()){", "if(!nativeHls && typeof Hls!=='undefined' && Hls.isSupported()){");
- html=html.replaceAll("v.play().catch(()=>{});", "const playing=v.play(); if(playing&&playing.catch) playing.catch(()=>{});");
+ // Every playback request must handle asynchronous cancellation by pause/seek.
+ html=html.replaceAll("v.play().catch(()=>{});", "philipsPlay(v);");
+ html=html.replaceAll("v.play();", "philipsPlay(v);");
+ html=html.replaceAll("$('vid').play();", "philipsPlay($('vid'));");
  html=html.replace("function doExit(){ if(window.tizen)", "function doExit(){ if(_isPhilips){ if(history.length>1) history.back(); else {closeExit(); alert('Для выхода используйте кнопку Home на пульте.');} return; } if(window.tizen)");
  // Normalize legacy Philips keyCode events before existing key handlers see them.
  const remote=`(function(){
@@ -46,12 +49,12 @@ const _isTizen=_isSamsung||_isPhilips;`);
  html=html.replaceAll("document.addEventListener('keyup',e=>{", "document.addEventListener('keyup',e=>{e=philipsKeyEvent(e);");
  html=html.replace('const obs=new IntersectionObserver(entries=>{', "if(typeof IntersectionObserver==='undefined') return;\n  const obs=new IntersectionObserver(entries=>{");
  html=html.replace('if(_isTizen) el.scrollIntoView({block:', 'if(_isPhilips) el.scrollIntoView(false);\n  else if(_isTizen) el.scrollIntoView({block:');
- html=html.replace("if(k==='MediaPlayPause'||k==='Pause')", "if(k==='MediaPlay'){if(Z==='player'){const p=$('vid').play();if(p&&p.catch)p.catch(()=>{});e.preventDefault();}return;}\n  if(k==='MediaPause'){if(Z==='player'){$('vid').pause();e.preventDefault();}return;}\n  if(k==='MediaStop'){if(Z==='player'){closePlayer();e.preventDefault();}return;}\n  if(k==='MediaPlayPause'||k==='Pause')");
+ html=html.replace("if(k==='MediaPlayPause'||k==='Pause')", "if(k==='MediaPlay'){if(Z==='player'){philipsPlay($('vid'));e.preventDefault();}return;}\n  if(k==='MediaPause'){if(Z==='player'){$('vid').pause();e.preventDefault();}return;}\n  if(k==='MediaStop'){if(Z==='player'){closePlayer();e.preventDefault();}return;}\n  if(k==='MediaPlayPause'||k==='Pause')");
  const match=html.match(/<script>([\s\S]*?)<\/script>/);
  const result=await babel.transformAsync(match[1],{presets:[[preset,{targets:{chrome:'38'},modules:false,useBuiltIns:false}]],comments:true});
  fs.writeFileSync(path.join(out,'js/app.js'),result.code);
  fs.copyFileSync(path.join(root,'philips-boot.js'),path.join(out,'js/boot.js'));
- html=html.replace(match[0],'<script src="js/boot.js?v=103"></script>\n<script src="js/polyfills.js?v=103" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=103" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
+ html=html.replace(match[0],'<script src="js/boot.js?v=104"></script>\n<script src="js/polyfills.js?v=104" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=104" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
  html=html.replace('</style>', `
 /* Older SAPHI engines: readable layouts without CSS Grid or flex gap. */
 @supports not (display:grid){
@@ -85,7 +88,7 @@ html.philips-tv .ply-back-btn{top:20px;left:4%;}
 html.philips-tv #skipBtn{right:4%;bottom:235px;}
 html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </style>`);
- html=html.replace('<script src="js/app.js?v=103"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=103"`);
+ html=html.replace('<script src="js/app.js?v=104"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=104"`);
  // Resolve CSS variables for engines predating custom properties.
  const vars={};html.replace(/--([\w-]+):([^;}]+)/g,(_,k,v)=>{if(!(k in vars))vars[k]=v;return _;});
  html=html.replace(/var\(--([\w-]+)\)/g,(m,k)=>vars[k]||m);

@@ -3,7 +3,7 @@
   function show(message) {
     var box=document.getElementById('philipsDiagnostic');
     if(!box){box=document.createElement('div');box.id='philipsDiagnostic';box.style.cssText='position:fixed;left:3%;right:3%;bottom:4%;z-index:999999;background:#161c2e;color:#fff;border:2px solid #e8272f;padding:18px;font:18px Arial;white-space:pre-wrap;';document.body.appendChild(box);}
-    box.textContent='AniLiberty Philips 1.0.3\n'+message+'\nПоследняя кнопка: '+lastKey;
+    box.textContent='AniLiberty Philips 1.0.4\n'+message+'\nПоследняя кнопка: '+lastKey;
   }
   window.philipsBoot={
     fail:function(message){lastError=String(message);show(lastError);},
@@ -11,7 +11,14 @@
     apiError:function(message){lastError='Не удалось загрузить данные: '+String(message);if(!ready)show(lastError);}
   };
   window.addEventListener('error',function(e){if(e.message)window.philipsBoot.fail(e.message+' (строка '+e.lineno+')');});
-  window.addEventListener('unhandledrejection',function(e){window.philipsBoot.fail(e.reason&&e.reason.message||'Ошибка запуска');});
+  function cancelledPlayback(error){
+    return !!error && error.name==='AbortError' && /play\(\).*interrupted/i.test(error.message||'');
+  }
+  window.philipsPlay=function(video){
+    function failed(error){if(!cancelledPlayback(error))window.philipsBoot.fail(error&&error.message||'Не удалось начать воспроизведение');}
+    try{var request=video.play();if(request&&request.catch)request.catch(failed);}catch(error){failed(error);}
+  };
+  window.addEventListener('unhandledrejection',function(e){if(cancelledPlayback(e.reason)){e.preventDefault();return;}window.philipsBoot.fail(e.reason&&e.reason.message||'Ошибка запуска');});
   document.addEventListener('keydown',function(e){lastKey=String(e.keyCode||e.which)+' / '+String(e.key||'');if(document.getElementById('philipsDiagnostic'))show(lastError||'Данные ещё не загрузились');},true);
   setTimeout(function(){if(!ready)show(lastError||'Каталог не загрузился. Проверьте интернет на телевизоре и повторите запуск.');},20000);
   window.philipsKeyEvent=function(e){
