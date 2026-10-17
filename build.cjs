@@ -7,6 +7,8 @@ async function build(){
  const esbuild=require('./tooling/node_modules/esbuild');
  fs.mkdirSync(path.join(out,'js'),{recursive:true});
  let html=fs.readFileSync(path.join(source,'index.html'),'utf8');
+ // SAPHI lacks these glyphs; use plain labels, including timeupdate-generated ones.
+ html=html.replaceAll('⏩ ', '').replaceAll('⏭ ', '');
  html=html.replace("const _isTizen=!!window.tizen||/Tizen/i.test(navigator.userAgent);",`const _isSamsung=!!window.tizen||/Tizen/i.test(navigator.userAgent);
 const _isPhilips=/Philips|NETTV|Saphi/i.test(navigator.userAgent)||/[?&]tv=philips(?:&|$)/i.test(location.search);
 // Existing TV navigation and performance paths apply to both platforms.
@@ -54,7 +56,7 @@ const _isTizen=_isSamsung||_isPhilips;`);
  const result=await babel.transformAsync(match[1],{presets:[[preset,{targets:{chrome:'38'},modules:false,useBuiltIns:false}]],comments:true});
  fs.writeFileSync(path.join(out,'js/app.js'),result.code);
  fs.copyFileSync(path.join(root,'philips-boot.js'),path.join(out,'js/boot.js'));
- html=html.replace(match[0],'<script src="js/boot.js?v=105"></script>\n<script src="js/polyfills.js?v=105" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=105" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
+ html=html.replace(match[0],'<script src="js/boot.js?v=106"></script>\n<script src="js/polyfills.js?v=106" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=106" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
  html=html.replace('</style>', `
 /* Older SAPHI engines: readable layouts without CSS Grid or flex gap. */
 @supports not (display:grid){
@@ -88,7 +90,7 @@ html.philips-tv .ply-back-btn{top:20px;left:4%;}
 html.philips-tv #skipBtn{right:4%;bottom:235px;}
 html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </style>`);
- html=html.replace('<script src="js/app.js?v=105"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=105"`);
+ html=html.replace('<script src="js/app.js?v=106"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=106"`);
  // Resolve CSS variables for engines predating custom properties.
  const vars={};html.replace(/--([\w-]+):([^;}]+)/g,(_,k,v)=>{if(!(k in vars))vars[k]=v;return _;});
  html=html.replace(/var\(--([\w-]+)\)/g,(m,k)=>vars[k]||m);

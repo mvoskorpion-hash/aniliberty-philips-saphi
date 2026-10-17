@@ -3185,7 +3185,7 @@ function _loadVideo(url, startTime, ep) {
       }
       if ((inOpening || inEnding) && !window._skipDismissed) {
         var _sb = $('skipBtn');
-        var label = inEnding ? '⏩ Пропустить эндинг' : '⏩ Пропустить опенинг';
+        var label = inEnding ? 'Пропустить эндинг' : 'Пропустить опенинг';
         if (!_sb.classList.contains('on') || _sb.textContent !== label) {
           _sb.textContent = label;
           _sb.classList.add('on');
