@@ -42,15 +42,18 @@
       else for(var j=0;j<records[i].addedNodes.length;j++)replaceIcons(records[i].addedNodes[j]);
     }
   }).observe(document.body,{childList:true,characterData:true,subtree:true});
-  var lastError='', lastKey='не нажата', ready=false;
+  var lastError='', lastKey='не нажата', ready=false, diagnosticTimer=null;
+  function dismiss(){clearTimeout(diagnosticTimer);var box=document.getElementById('philipsDiagnostic');if(box)box.parentNode.removeChild(box);}
   function show(message) {
+    if(ready)return;
     var box=document.getElementById('philipsDiagnostic');
     if(!box){box=document.createElement('div');box.id='philipsDiagnostic';box.style.cssText='position:fixed;left:3%;right:3%;bottom:4%;z-index:999999;background:#161c2e;color:#fff;border:2px solid #e8272f;padding:18px;font:18px Arial;white-space:pre-wrap;';document.body.appendChild(box);}
-    box.textContent='AniLiberty Philips 1.0.6\n'+message+'\nПоследняя кнопка: '+lastKey;
+    box.textContent='AniLiberty Philips 1.0.7\n'+message+'\nПоследняя кнопка: '+lastKey;
+    clearTimeout(diagnosticTimer);diagnosticTimer=setTimeout(dismiss,12000);
   }
   window.philipsBoot={
-    fail:function(message){lastError=String(message);show(lastError);},
-    ready:function(){ready=true;var box=document.getElementById('philipsDiagnostic');if(box)box.parentNode.removeChild(box);},
+    fail:function(message){lastError=String(message);if(ready){if(window.console&&console.warn)console.warn('AniLiberty: '+lastError);return;}show(lastError);},
+    ready:function(){ready=true;dismiss();},
     apiError:function(message){lastError='Не удалось загрузить данные: '+String(message);if(!ready)show(lastError);}
   };
   window.addEventListener('error',function(e){if(e.message)window.philipsBoot.fail(e.message+' (строка '+e.lineno+')');});
@@ -62,7 +65,7 @@
     try{var request=video.play();if(request&&request.catch)request.catch(failed);}catch(error){failed(error);}
   };
   window.addEventListener('unhandledrejection',function(e){if(cancelledPlayback(e.reason)){e.preventDefault();return;}window.philipsBoot.fail(e.reason&&e.reason.message||'Ошибка запуска');});
-  document.addEventListener('keydown',function(e){lastKey=String(e.keyCode||e.which)+' / '+String(e.key||'');if(document.getElementById('philipsDiagnostic'))show(lastError||'Данные ещё не загрузились');},true);
+  document.addEventListener('keydown',function(e){lastKey=String(e.keyCode||e.which)+' / '+String(e.key||'');dismiss();},true);
   setTimeout(function(){if(!ready)show(lastError||'Каталог не загрузился. Проверьте интернет на телевизоре и повторите запуск.');},20000);
   window.philipsKeyEvent=function(e){
     var keys={13:'Enter',37:'ArrowLeft',38:'ArrowUp',39:'ArrowRight',40:'ArrowDown',8:'Backspace',27:'Escape',461:'Backspace',10009:'Backspace',415:'MediaPlay',19:'MediaPause',413:'MediaStop',412:'MediaRewind',417:'MediaFastForward',10252:'MediaPlayPause'};

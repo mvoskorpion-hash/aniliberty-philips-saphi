@@ -2949,8 +2949,7 @@ function startPlayer() {
     // no episodes — still open player UI
     $('plyTtl').textContent = rName(detRelease) || '';
     $('plyOv').classList.add('on');
-    $('plySpinner').style.display = 'none'; // actually show it
-    $('plySpin').style.display = 'flex';
+    $('plySpin').style.display = 'none';
     $('plyEpL').textContent = authToken ? 'Не удалось загрузить серии' : 'Авторизуйтесь для просмотра';
     nav.zone = 'player';
     nav.plyZone = 'video';
