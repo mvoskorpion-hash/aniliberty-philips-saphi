@@ -1,6 +1,16 @@
 (function () {
   // Draw UI icons instead of relying on emoji fonts absent on SAPHI.
   var icons={
+    '⛶':'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6',
+    '⏏':'M3 16l9-12 9 12zM3 21h18',
+    '⏳':'M5 2h14M5 22h14M7 2v5l10 10v5M17 2v5L7 17v5',
+    '✅':'M4 12l5 5L20 5',
+    '✓':'M4 12l5 5L20 5',
+    '✕':'M5 5l14 14M19 5L5 19',
+    '❤':'M12 21L3 12C-3 4 8-1 12 6c4-7 15-2 9 6z',
+    '▶':'M6 3l15 9L6 21z',
+    '↺':'M3 4v6h6M3 10a9 9 0 1 1 1 9',
+    '★':'M12 2l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z',
     '🔑':'M8 14a5 5 0 1 1 4-4L21 1M17 5l3 3M14 8l3 3',
     '🔍':'M15 15l6 6M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0',
     '👁':'M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
@@ -10,8 +20,12 @@
     '👤':'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0M3 22v-3a9 9 0 0 1 18 0v3',
     '🗑':'M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7'
   };
+  // Decorative poster placeholders also need a font-independent fallback.
+  var placeholders=['⚔','🔥','🌸','✨','🌊','💀','🐉','⭐','🎌','👾'];
+  for(var p=0;p<placeholders.length;p++)icons[placeholders[p]]=icons['★'];
   function replaceIcons(root){
     if(!root||!root.nodeType)return;
+    if(root.parentNode&&/^(SCRIPT|STYLE|SVG|TEXTAREA|INPUT)$/i.test(root.parentNode.nodeName))return;
     if(root.nodeType===1&&/^(SCRIPT|STYLE|SVG|TEXTAREA|INPUT)$/i.test(root.nodeName))return;
     if(root.nodeType===3){
       var value=root.nodeValue,found=false,key;
@@ -19,7 +33,7 @@
       if(!found)return;
       var fragment=document.createDocumentFragment(),text='',i=0;
       while(i<value.length){
-        var symbol=value.substr(i,2);
+        var symbol=icons[value.charAt(i)]?value.charAt(i):value.substr(i,2);
         if(icons[symbol]){
           if(text){fragment.appendChild(document.createTextNode(text));text='';}
           var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -27,7 +41,7 @@
           svg.setAttribute('style','display:inline-block;vertical-align:-0.12em;overflow:visible;');
           var shape=document.createElementNS('http://www.w3.org/2000/svg','path');
           shape.setAttribute('d',icons[symbol]);shape.setAttribute('fill','none');shape.setAttribute('stroke','currentColor');shape.setAttribute('stroke-width','2');shape.setAttribute('stroke-linecap','round');shape.setAttribute('stroke-linejoin','round');svg.appendChild(shape);fragment.appendChild(svg);
-          i+=2;if(value.charCodeAt(i)===65039)i++;
+          i+=symbol.length;if(value.charCodeAt(i)===65039)i++;
         }else{text+=value.charAt(i++);}
       }
       if(text)fragment.appendChild(document.createTextNode(text));root.parentNode.replaceChild(fragment,root);return;
@@ -48,7 +62,7 @@
     if(ready)return;
     var box=document.getElementById('philipsDiagnostic');
     if(!box){box=document.createElement('div');box.id='philipsDiagnostic';box.style.cssText='position:fixed;left:3%;right:3%;bottom:4%;z-index:999999;background:#161c2e;color:#fff;border:2px solid #e8272f;padding:18px;font:18px Arial;white-space:pre-wrap;';document.body.appendChild(box);}
-    box.textContent='AniLiberty Philips 1.0.7\n'+message+'\nПоследняя кнопка: '+lastKey;
+    box.textContent='AniLiberty Philips 1.0.8\n'+message+'\nПоследняя кнопка: '+lastKey;
     clearTimeout(diagnosticTimer);diagnosticTimer=setTimeout(dismiss,12000);
   }
   window.philipsBoot={

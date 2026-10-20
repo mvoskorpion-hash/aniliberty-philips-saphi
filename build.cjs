@@ -11,6 +11,11 @@ async function build(){
  html=html.replace(/\$\('plySpinner'\)\.style\.display='none'; \/\/ actually show it\s*\$\('plySpin'\)\.style\.display='flex';/, "$('plySpin').style.display='none';");
  // SAPHI lacks these glyphs; use plain labels, including timeupdate-generated ones.
  html=html.replaceAll('⏩ ', '').replaceAll('⏭ ', '');
+ // Keyboard handling accidentally copied into timeupdate uses undefined k/e.
+ html=html.replace(/      if\(nav\.plyZone==='back'\)\{[\s\S]*?    if\(nav\.plyZone==='skip'\)\{ nav\.plyZone='video'; \}/, '');
+ // The upstream registers the same fullscreen listeners twice.
+ const fullscreenBinding=html.match(/\$\('fsBtn'\)\.addEventListener\('click', toggleFullscreen\);[\s\S]*?\n\}\);/);
+ if(fullscreenBinding){const first=html.indexOf(fullscreenBinding[0]);const second=html.indexOf(fullscreenBinding[0],first+fullscreenBinding[0].length);if(second>=0)html=html.slice(0,second)+html.slice(second+fullscreenBinding[0].length);}
  html=html.replace("const _isTizen=!!window.tizen||/Tizen/i.test(navigator.userAgent);",`const _isSamsung=!!window.tizen||/Tizen/i.test(navigator.userAgent);
 const _isPhilips=/Philips|NETTV|Saphi/i.test(navigator.userAgent)||/[?&]tv=philips(?:&|$)/i.test(location.search);
 // Existing TV navigation and performance paths apply to both platforms.
@@ -58,7 +63,7 @@ const _isTizen=_isSamsung||_isPhilips;`);
  const result=await babel.transformAsync(match[1],{presets:[[preset,{targets:{chrome:'38'},modules:false,useBuiltIns:false}]],comments:true});
  fs.writeFileSync(path.join(out,'js/app.js'),result.code);
  fs.copyFileSync(path.join(root,'philips-boot.js'),path.join(out,'js/boot.js'));
- html=html.replace(match[0],'<script src="js/boot.js?v=107"></script>\n<script src="js/polyfills.js?v=107" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=107" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
+ html=html.replace(match[0],'<script src="js/boot.js?v=108"></script>\n<script src="js/polyfills.js?v=108" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=108" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
  html=html.replace('</style>', `
 /* Older SAPHI engines: readable layouts without CSS Grid or flex gap. */
 @supports not (display:grid){
@@ -92,7 +97,7 @@ html.philips-tv .ply-back-btn{top:20px;left:4%;}
 html.philips-tv #skipBtn{right:4%;bottom:235px;}
 html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </style>`);
- html=html.replace('<script src="js/app.js?v=107"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=107"`);
+ html=html.replace('<script src="js/app.js?v=108"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=108"`);
  // Resolve CSS variables for engines predating custom properties.
  const vars={};html.replace(/--([\w-]+):([^;}]+)/g,(_,k,v)=>{if(!(k in vars))vars[k]=v;return _;});
  html=html.replace(/var\(--([\w-]+)\)/g,(m,k)=>vars[k]||m);

@@ -140,8 +140,8 @@ var Store = {
         // Remove oldest progress entries to free space
         var pkeys = [];
         for (var i = 0; i < localStorage.length; i++) {
-          var _k = localStorage.key(i);
-          if (_k && _k.startsWith('alv_p_')) pkeys.push(_k);
+          var k = localStorage.key(i);
+          if (k && k.startsWith('alv_p_')) pkeys.push(k);
         }
         // Sort by updated time, remove oldest half
         pkeys.sort(function (a, b) {
@@ -198,12 +198,12 @@ var Store = {
     if (this._pidx) return;
     this._pidx = {};
     for (var i = 0; i < localStorage.length; i++) {
-      var _k2 = localStorage.key(i);
-      if (_k2 && _k2.startsWith('alv_p_')) {
-        var parts = _k2.split('_'); // alv_p_{rid}_{epId}
+      var k = localStorage.key(i);
+      if (k && k.startsWith('alv_p_')) {
+        var parts = k.split('_'); // alv_p_{rid}_{epId}
         var rid = parts[2];
         if (!this._pidx[rid]) this._pidx[rid] = [];
-        this._pidx[rid].push(_k2);
+        this._pidx[rid].push(k);
       }
     }
   },
@@ -224,8 +224,8 @@ var Store = {
       _step;
     try {
       for (_iterator.s(); !(_step = _iterator.n()).done;) {
-        var _k3 = _step.value;
-        var v = this.get(_k3);
+        var k = _step.value;
+        var v = this.get(k);
         if (!v) continue;
         if (v.epsTotal > bestEpsTotal) bestEpsTotal = v.epsTotal;
         if (v.epOrdinal > maxOrdinal) maxOrdinal = v.epOrdinal;
@@ -254,12 +254,12 @@ var Store = {
       _step2;
     try {
       for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-        var _k4 = _step2.value;
-        var v = this.get(_k4);
+        var k = _step2.value;
+        var v = this.get(k);
         if (v && v.updated > bestTime) {
           bestTime = v.updated;
           best = _objectSpread(_objectSpread({}, v), {}, {
-            epId: _k4.slice(prefix.length)
+            epId: k.slice(prefix.length)
           });
         }
       }
@@ -369,9 +369,9 @@ function _api() {
       _arr,
       base,
       r,
+      e,
       _e,
       _e2,
-      _e3,
       _args3 = arguments,
       _t3;
     return _regenerator().w(function (_context3) {
@@ -402,25 +402,25 @@ function _api() {
             _context3.n = 4;
             break;
           }
-          _e = new Error('Unauthorized');
-          _e.code = 401;
-          throw _e;
+          e = new Error('Unauthorized');
+          e.code = 401;
+          throw e;
         case 4:
           if (!(r.status === 422)) {
             _context3.n = 5;
             break;
           }
-          _e2 = new Error('Validation');
-          _e2.code = 422;
-          throw _e2;
+          _e = new Error('Validation');
+          _e.code = 422;
+          throw _e;
         case 5:
           if (r.ok) {
             _context3.n = 6;
             break;
           }
-          _e3 = new Error('HTTP ' + r.status);
-          _e3.code = r.status;
-          throw _e3;
+          _e2 = new Error('HTTP ' + r.status);
+          _e2.code = r.status;
+          throw _e2;
         case 6:
           _context3.n = 7;
           return r.json();
@@ -573,7 +573,7 @@ function pushAllTimecodes() {
 // API requires type_of_collection as required param — must fetch each type separately
 function _pushAllTimecodes() {
   _pushAllTimecodes = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
-    var batch, i, _k7, v, parts, epId, _i3, _t6;
+    var batch, i, k, v, parts, epId, _i3, _t6;
     return _regenerator().w(function (_context6) {
       while (1) switch (_context6.p = _context6.n) {
         case 0:
@@ -591,16 +591,16 @@ function _pushAllTimecodes() {
             _context6.n = 5;
             break;
           }
-          _k7 = localStorage.key(i);
-          if (_k7 !== null && _k7 !== void 0 && _k7.startsWith('alv_p_')) {
+          k = localStorage.key(i);
+          if (k !== null && k !== void 0 && k.startsWith('alv_p_')) {
             _context6.n = 3;
             break;
           }
           return _context6.a(3, 4);
         case 3:
           try {
-            v = JSON.parse(localStorage.getItem(_k7));
-            parts = _k7.split('_'); // alv_p_{rid}_{epId}
+            v = JSON.parse(localStorage.getItem(k));
+            parts = k.split('_'); // alv_p_{rid}_{epId}
             epId = parts.slice(3).join('_'); // epId may contain underscores
             if ((v === null || v === void 0 ? void 0 : v.time) > 0 && epId) {
               batch.push({
@@ -2508,7 +2508,7 @@ function openDetailRelease(_x1) {
 // Done = reached ending start time, OR 90%+ watched if no ending data
 function _openDetailRelease() {
   _openDetailRelease = _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee22(r) {
-    var _r$season, _r$season2, _$19;
+    var _r$season, _r$season2, _$18;
     var url, bdgs, fav0, seasonMap, seasonName, genres, dur, durStr, epsTotal, epsStr, COLLS, lastProg, hasProgress, detail, eps, realTotal, metaEl, d2, durStr2, _metaEl, allK, totalK, dk, dv, fr, franchises, relMap, allItems, _t20, _t21;
     return _regenerator().w(function (_context25) {
       while (1) switch (_context25.p = _context25.n) {
@@ -2602,7 +2602,7 @@ function _openDetailRelease() {
             });
           });
           // [progress block moved below pullTimecodes]
-          (_$19 = $('detReset')) === null || _$19 === void 0 || _$19.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21() {
+          (_$18 = $('detReset')) === null || _$18 === void 0 || _$18.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee21() {
             var prefix, epIdsToDelete, ids, _t19;
             return _regenerator().w(function (_context24) {
               while (1) switch (_context24.p = _context24.n) {
@@ -3198,27 +3198,6 @@ function _loadVideo(url, startTime, ep) {
         window._skipDismissed = false;
         $('skipBtn').classList.remove('on', 'foc');
         if (nav.plyZone === 'skip') nav.plyZone = 'video';
-        if (nav.plyZone === 'back') {
-          if (k === 'ArrowRight' || k === 'Escape' || k === 'Backspace' || k === 'GoBack') {
-            var _$;
-            (_$ = $('pcClose')) === null || _$ === void 0 || _$.classList.remove('foc');
-            nav.plyZone = 'ctrl';
-            nav.plyBtn = 0;
-            applyPlyFoc();
-            e.preventDefault();
-            return;
-          }
-          if (k === 'Enter') {
-            $('pcClose').click();
-            e.preventDefault();
-            return;
-          }
-          e.preventDefault();
-          return;
-        }
-        if (nav.plyZone === 'skip') {
-          nav.plyZone = 'video';
-        }
       }
     });
   };
@@ -3318,8 +3297,8 @@ function selectQual(key) {
     nav.plyZone = 'ctrl';
     nav.plyBtn = 1;
     PLY_BTNS.forEach(function (id, i) {
-      var _$2;
-      return (_$2 = $(id)) === null || _$2 === void 0 ? void 0 : _$2.classList.toggle('foc', i === 1);
+      var _$;
+      return (_$ = $(id)) === null || _$ === void 0 ? void 0 : _$.classList.toggle('foc', i === 1);
     });
     $('plyBar').classList.remove('bar-foc');
     clearTimeout(ctrlTimer);
@@ -3334,16 +3313,16 @@ function buildQualBtn(ep) {
   $('pcQual').style.display = quals.length >= 2 ? '' : 'none';
 }
 function applyPlyFoc() {
-  var _$4, _$5;
+  var _$3, _$4;
   var isCtrl = nav.plyZone === 'ctrl',
     isEps = nav.plyZone === 'eps',
     isBar = nav.plyZone === 'bar';
   PLY_BTNS.forEach(function (id, i) {
-    var _$3;
-    return (_$3 = $(id)) === null || _$3 === void 0 ? void 0 : _$3.classList.toggle('foc', isCtrl && i === nav.plyBtn);
+    var _$2;
+    return (_$2 = $(id)) === null || _$2 === void 0 ? void 0 : _$2.classList.toggle('foc', isCtrl && i === nav.plyBtn);
   });
-  (_$4 = $('pcPrev')) === null || _$4 === void 0 || _$4.classList.toggle('pb-disabled', playerEpIdx <= 0);
-  (_$5 = $('pcNext')) === null || _$5 === void 0 || _$5.classList.toggle('pb-disabled', playerEpIdx >= playerEps.length - 1);
+  (_$3 = $('pcPrev')) === null || _$3 === void 0 || _$3.classList.toggle('pb-disabled', playerEpIdx <= 0);
+  (_$4 = $('pcNext')) === null || _$4 === void 0 || _$4.classList.toggle('pb-disabled', playerEpIdx >= playerEps.length - 1);
   $('plyBar').classList.toggle('bar-foc', isBar);
   if (isEps) {
     var strip = _$plyEps || $('plyEps');
@@ -3362,12 +3341,12 @@ function applyPlyFoc() {
   $('skipBtn').classList.toggle('foc', nav.plyZone === 'skip');
 }
 function _plyHideUI() {
-  var _$7;
+  var _$6;
   clearTimeout(ctrlTimer);
   (_$plyOv || $('plyOv')).classList.remove('ctrl');
   PLY_BTNS.forEach(function (id) {
-    var _$6;
-    return (_$6 = $(id)) === null || _$6 === void 0 ? void 0 : _$6.classList.remove('foc');
+    var _$5;
+    return (_$5 = $(id)) === null || _$5 === void 0 ? void 0 : _$5.classList.remove('foc');
   });
   $('plyBar').classList.remove('bar-foc');
   document.querySelectorAll('.pep.foc').forEach(function (p) {
@@ -3375,22 +3354,22 @@ function _plyHideUI() {
   });
   if ($('skipBtn').classList.contains('on')) window._skipDismissed = true;
   $('skipBtn').classList.remove('on', 'foc');
-  (_$7 = $('skipNextBtn')) === null || _$7 === void 0 || _$7.classList.remove('on', 'foc');
+  (_$6 = $('skipNextBtn')) === null || _$6 === void 0 || _$6.classList.remove('on', 'foc');
   nav.plyZone = 'video';
 }
 function plyEnterCtrl() {
-  var _$8;
+  var _$7;
   nav.plyZone = 'ctrl';
   // If current button is disabled, move to Play (index 1)
-  if ((_$8 = $(PLY_BTNS[nav.plyBtn])) !== null && _$8 !== void 0 && _$8.classList.contains('pb-disabled')) nav.plyBtn = 1;
+  if ((_$7 = $(PLY_BTNS[nav.plyBtn])) !== null && _$7 !== void 0 && _$7.classList.contains('pb-disabled')) nav.plyBtn = 1;
   showCtrl();
   applyPlyFoc();
 }
 function plyLeaveCtrl() {
   nav.plyZone = 'video';
   PLY_BTNS.forEach(function (id) {
-    var _$9;
-    return (_$9 = $(id)) === null || _$9 === void 0 ? void 0 : _$9.classList.remove('foc');
+    var _$8;
+    return (_$8 = $(id)) === null || _$8 === void 0 ? void 0 : _$8.classList.remove('foc');
   });
   document.querySelectorAll('.pep.foc').forEach(function (p) {
     return p.classList.remove('foc');
@@ -3409,8 +3388,8 @@ function showCtrl() {
     if (nav.plyZone === 'qual') return;
     _ov.classList.remove('ctrl');
     PLY_BTNS.forEach(function (id) {
-      var _$0;
-      return (_$0 = $(id)) === null || _$0 === void 0 ? void 0 : _$0.classList.remove('foc');
+      var _$9;
+      return (_$9 = $(id)) === null || _$9 === void 0 ? void 0 : _$9.classList.remove('foc');
     });
     $('plyBar').classList.remove('bar-foc');
     document.querySelectorAll('.pep.foc').forEach(function (p) {
@@ -3438,7 +3417,7 @@ function togglePlay() {
   showCtrl();
 }
 function refreshDetActBtn(r) {
-  var _$1;
+  var _$0;
   var lastProg = Store.getReleaseProgress(r.id);
   var hasProgress = lastProg && lastProg.time > 60;
   if (hasProgress) {
@@ -3459,7 +3438,7 @@ function refreshDetActBtn(r) {
     startPlayer();
     window._forceStart = undefined;
   });
-  (_$1 = $('detReset')) === null || _$1 === void 0 || _$1.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
+  (_$0 = $('detReset')) === null || _$0 === void 0 || _$0.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
     var prefix2, epIds2, ids2, _t;
     return _regenerator().w(function (_context) {
       while (1) switch (_context.p = _context.n) {
@@ -3796,8 +3775,8 @@ function closeLogin() {
   $('lp').classList.remove('on');
   // убираем .foc со всех полей
   ['lpL', 'lpP', 'lpOk', 'lpX'].forEach(function (id) {
-    var _$10;
-    return (_$10 = $(id)) === null || _$10 === void 0 ? void 0 : _$10.classList.remove('foc');
+    var _$1;
+    return (_$1 = $(id)) === null || _$1 === void 0 ? void 0 : _$1.classList.remove('foc');
   });
   nav.zone = pg.cur === 'home' ? 'home.cards' : 'cat.grid';
 }
@@ -3833,16 +3812,16 @@ function openProfilePanel() {
 }
 function ppApplyFoc() {
   ['profileClose', 'profileLogout'].forEach(function (id, i) {
-    var _$11;
-    (_$11 = $(id)) === null || _$11 === void 0 || _$11.classList.toggle('foc', i === nav.profileI);
+    var _$10;
+    (_$10 = $(id)) === null || _$10 === void 0 || _$10.classList.toggle('foc', i === nav.profileI);
   });
 }
 function closeProfilePanel() {
   $('profilePanel').classList.remove('on');
   nav.zone = pg.cur === 'home' ? 'home.cards' : 'cat.grid';
   ['profileClose', 'profileLogout'].forEach(function (id) {
-    var _$12;
-    return (_$12 = $(id)) === null || _$12 === void 0 ? void 0 : _$12.classList.remove('foc');
+    var _$11;
+    return (_$11 = $(id)) === null || _$11 === void 0 ? void 0 : _$11.classList.remove('foc');
   });
 }
 $('profileClose').addEventListener('click', closeProfilePanel);
@@ -4697,8 +4676,8 @@ function handleKey(e) {
     if (pz === 'ctrl') {
       if (k === 'ArrowLeft') {
         var btn = nav.plyBtn - 1;
-        while (btn >= 0 && (_$13 = $(PLY_BTNS[btn])) !== null && _$13 !== void 0 && _$13.classList.contains('pb-disabled')) {
-          var _$13;
+        while (btn >= 0 && (_$12 = $(PLY_BTNS[btn])) !== null && _$12 !== void 0 && _$12.classList.contains('pb-disabled')) {
+          var _$12;
           btn--;
         }
         if (btn >= 0) {
@@ -4710,8 +4689,8 @@ function handleKey(e) {
       }
       if (k === 'ArrowRight') {
         var _btn = nav.plyBtn + 1;
-        while (_btn < PLY_BTNS.length && (_$14 = $(PLY_BTNS[_btn])) !== null && _$14 !== void 0 && _$14.classList.contains('pb-disabled')) {
-          var _$14;
+        while (_btn < PLY_BTNS.length && (_$13 = $(PLY_BTNS[_btn])) !== null && _$13 !== void 0 && _$13.classList.contains('pb-disabled')) {
+          var _$13;
           _btn++;
         }
         if (_btn < PLY_BTNS.length) {
@@ -4740,13 +4719,13 @@ function handleKey(e) {
         return;
       }
       if (k === 'Enter' || k === ' ') {
-        var _$15;
+        var _$14;
         showCtrl();
         var id = PLY_BTNS[nav.plyBtn];
         if (id === 'pcQual') openQualMenu();else if (id === 'pcFit') {
           cycleFit();
           applyPlyFoc();
-        } else (_$15 = $(id)) === null || _$15 === void 0 || _$15.click();
+        } else (_$14 = $(id)) === null || _$14 === void 0 || _$14.click();
         return;
       }
       return;
@@ -5066,10 +5045,10 @@ function navCatSearch(k) {
     nav.zone = 'home.nav';
     focNavTab(1);
   } else if (k === 'Enter') {
-    var _$$select, _$16;
+    var _$$select, _$15;
     // системная клавиатура — фокус на инпут
     $('catQ').focus();
-    (_$$select = (_$16 = $('catQ')).select) === null || _$$select === void 0 || _$$select.call(_$16);
+    (_$$select = (_$15 = $('catQ')).select) === null || _$$select === void 0 || _$$select.call(_$15);
   }
 }
 function navCatGrid(k) {
@@ -5450,8 +5429,8 @@ function navDetail(k) {
     return;
   }
   if (k === 'Enter') {
-    var _$17, _actBtns$nav$detAct, _collBtns$nav$detColl, _epBtns$nav$detEp, _relCards;
-    if (Z === 'det.back') (_$17 = $('detBack')) === null || _$17 === void 0 || _$17.click();else if (Z === 'det.acts') (_actBtns$nav$detAct = actBtns[nav.detAct]) === null || _actBtns$nav$detAct === void 0 || _actBtns$nav$detAct.click();else if (Z === 'det.coll') (_collBtns$nav$detColl = collBtns[nav.detColl]) === null || _collBtns$nav$detColl === void 0 || _collBtns$nav$detColl.click();else if (Z === 'det.eps') (_epBtns$nav$detEp = epBtns[nav.detEp]) === null || _epBtns$nav$detEp === void 0 || _epBtns$nav$detEp.click();else if (Z === 'det.related') (_relCards = relCards[nav.detRel || 0]) === null || _relCards === void 0 || _relCards.click();
+    var _$16, _actBtns$nav$detAct, _collBtns$nav$detColl, _epBtns$nav$detEp, _relCards;
+    if (Z === 'det.back') (_$16 = $('detBack')) === null || _$16 === void 0 || _$16.click();else if (Z === 'det.acts') (_actBtns$nav$detAct = actBtns[nav.detAct]) === null || _actBtns$nav$detAct === void 0 || _actBtns$nav$detAct.click();else if (Z === 'det.coll') (_collBtns$nav$detColl = collBtns[nav.detColl]) === null || _collBtns$nav$detColl === void 0 || _collBtns$nav$detColl.click();else if (Z === 'det.eps') (_epBtns$nav$detEp = epBtns[nav.detEp]) === null || _epBtns$nav$detEp === void 0 || _epBtns$nav$detEp.click();else if (Z === 'det.related') (_relCards = relCards[nav.detRel || 0]) === null || _relCards === void 0 || _relCards.click();
   }
   if (k === 'LongEnter') {
     if (Z === 'det.eps') {
@@ -5549,8 +5528,8 @@ function applyDetFoc() {
   var epBtns = _toConsumableArray(document.querySelectorAll('.dep'));
   var relCards = _toConsumableArray(document.querySelectorAll('.det-related .det-rel-card:not(.drc-current)'));
   if (Z === 'det.back') {
-    var _$18;
-    (_$18 = $('detBack')) === null || _$18 === void 0 || _$18.classList.add('foc');
+    var _$17;
+    (_$17 = $('detBack')) === null || _$17 === void 0 || _$17.classList.add('foc');
     // Scroll to very top of detail body
     var db = document.querySelector('.det-body');
     if (db) db.scrollTop = 0;
@@ -5644,34 +5623,34 @@ function pollGamepad() {
       var bidx = _GP_BTN[bi][0],
         bkey = _GP_BTN[bi][1];
       var pressed = ((_gp$buttons$bidx = gp.buttons[bidx]) === null || _gp$buttons$bidx === void 0 ? void 0 : _gp$buttons$bidx.pressed) || false;
-      var _k5 = id + '_' + bidx;
+      var k = id + '_' + bidx;
       if (pressed) {
-        if (!GP.prev[_k5]) {
+        if (!GP.prev[k]) {
           simulateKey(bkey);
-          GP.repeatTime[_k5] = now + GP.REPEAT_INITIAL;
-        } else if (now > GP.repeatTime[_k5]) {
+          GP.repeatTime[k] = now + GP.REPEAT_INITIAL;
+        } else if (now > GP.repeatTime[k]) {
           simulateKey(bkey);
-          GP.repeatTime[_k5] = now + GP.REPEAT_INTERVAL;
+          GP.repeatTime[k] = now + GP.REPEAT_INTERVAL;
         }
       }
-      GP.prev[_k5] = pressed;
+      GP.prev[k] = pressed;
     }
     var DEAD = 0.6,
       ax = gp.axes[0] || 0,
       ay = gp.axes[1] || 0;
     var aVals = [ax > DEAD, ax < -DEAD, ay > DEAD, ay < -DEAD];
     for (var ai = 0; ai < 4; ai++) {
-      var _k6 = id + '_a' + ai;
+      var _k = id + '_a' + ai;
       if (aVals[ai]) {
-        if (!GP.prev[_k6]) {
+        if (!GP.prev[_k]) {
           simulateKey(_GP_AX_KEYS[ai]);
-          GP.repeatTime[_k6] = now + GP.REPEAT_INITIAL;
-        } else if (now > GP.repeatTime[_k6]) {
+          GP.repeatTime[_k] = now + GP.REPEAT_INITIAL;
+        } else if (now > GP.repeatTime[_k]) {
           simulateKey(_GP_AX_KEYS[ai]);
-          GP.repeatTime[_k6] = now + GP.REPEAT_INTERVAL;
+          GP.repeatTime[_k] = now + GP.REPEAT_INTERVAL;
         }
       }
-      GP.prev[_k6] = aVals[ai];
+      GP.prev[_k] = aVals[ai];
     }
   }
   // stop loop if no gamepads to save CPU
@@ -5699,11 +5678,7 @@ document.addEventListener('fullscreenchange', function () {
   var b = $('fsBtn');
   if (b) b.textContent = document.fullscreenElement ? '✕' : '⛶';
 });
-$('fsBtn').addEventListener('click', toggleFullscreen);
-document.addEventListener('fullscreenchange', function () {
-  var b = $('fsBtn');
-  if (b) b.textContent = document.fullscreenElement ? '✕' : '⛶';
-});
+
 // Delegation for cards
 _cardDelegation($('homeRows'));
 _cardDelegation($('catGrid'));
