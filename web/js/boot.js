@@ -1,6 +1,16 @@
 (function () {
   // Draw UI icons instead of relying on emoji fonts absent on SAPHI.
   var icons={
+    '◄':'M17 3L5 12l12 9z',
+    '►':'M6 3l15 9L6 21z',
+    '⏩':'M2 4l9 8-9 8zM12 4l9 8-9 8z',
+    '⏭':'M4 4l12 8-12 8zM20 3v18',
+    '→':'M3 12h18M14 5l7 7-7 7',
+    '←':'M21 12H3M10 5l-7 7 7 7',
+    '‹':'M16 4l-8 8 8 8',
+    '›':'M8 4l8 8-8 8',
+    '●':'M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
+    '•':'M14 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0',
     '⛶':'M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6',
     '⏏':'M3 16l9-12 9 12zM3 21h18',
     '⏳':'M5 2h14M5 22h14M7 2v5l10 10v5M17 2v5L7 17v5',
@@ -62,7 +72,7 @@
     if(ready)return;
     var box=document.getElementById('philipsDiagnostic');
     if(!box){box=document.createElement('div');box.id='philipsDiagnostic';box.style.cssText='position:fixed;left:3%;right:3%;bottom:4%;z-index:999999;background:#161c2e;color:#fff;border:2px solid #e8272f;padding:18px;font:18px Arial;white-space:pre-wrap;';document.body.appendChild(box);}
-    box.textContent='AniLiberty Philips 1.0.8\n'+message+'\nПоследняя кнопка: '+lastKey;
+    box.textContent='AniLiberty Philips 1.0.9\n'+message+'\nПоследняя кнопка: '+lastKey;
     clearTimeout(diagnosticTimer);diagnosticTimer=setTimeout(dismiss,12000);
   }
   window.philipsBoot={

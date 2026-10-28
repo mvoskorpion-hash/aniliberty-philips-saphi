@@ -63,7 +63,7 @@ const _isTizen=_isSamsung||_isPhilips;`);
  const result=await babel.transformAsync(match[1],{presets:[[preset,{targets:{chrome:'38'},modules:false,useBuiltIns:false}]],comments:true});
  fs.writeFileSync(path.join(out,'js/app.js'),result.code);
  fs.copyFileSync(path.join(root,'philips-boot.js'),path.join(out,'js/boot.js'));
- html=html.replace(match[0],'<script src="js/boot.js?v=108"></script>\n<script src="js/polyfills.js?v=108" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=108" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
+ html=html.replace(match[0],'<script src="js/boot.js?v=109"></script>\n<script src="js/polyfills.js?v=109" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=109" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
  html=html.replace('</style>', `
 /* Older SAPHI engines: readable layouts without CSS Grid or flex gap. */
 @supports not (display:grid){
@@ -76,6 +76,12 @@ html.legacy-gap .track>.card{margin-right:10px;}
 html.legacy-gap #nav>*,html.legacy-gap #hdr-r>*{margin-right:12px;}
 html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
+html.philips-tv button svg{flex-shrink:0;}
+html.philips-tv button{white-space:nowrap;}
+html.philips-tv .foc{outline:3px solid #ff5262!important;outline-offset:2px;}
+html.philips-tv #collTabs{display:flex;flex-wrap:wrap;}
+html.philips-tv #collTabs .ctab{margin:4px;min-height:42px;}
+html.philips-tv .ply-row{display:flex;align-items:center;}
 html.philips-tv #plyOv{top:0;right:0;bottom:0;left:0;}
 html.philips-tv .ply-wrap{position:absolute;top:0;right:0;bottom:0;left:0;}
 html.philips-tv #vid{position:absolute;top:0;left:0;width:100%;height:100%;}
@@ -97,7 +103,7 @@ html.philips-tv .ply-back-btn{top:20px;left:4%;}
 html.philips-tv #skipBtn{right:4%;bottom:235px;}
 html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </style>`);
- html=html.replace('<script src="js/app.js?v=108"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=108"`);
+ html=html.replace('<script src="js/app.js?v=109"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=109"`);
  // Resolve CSS variables for engines predating custom properties.
  const vars={};html.replace(/--([\w-]+):([^;}]+)/g,(_,k,v)=>{if(!(k in vars))vars[k]=v;return _;});
  html=html.replace(/var\(--([\w-]+)\)/g,(m,k)=>vars[k]||m);
