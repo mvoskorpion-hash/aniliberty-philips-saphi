@@ -77,6 +77,17 @@ html.legacy-gap .track>.card{margin-right:10px;}
 html.legacy-gap #nav>*,html.legacy-gap #hdr-r>*{margin-right:12px;}
 html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
+html.philips-tv #pgSchedule{position:relative;padding:0;box-sizing:border-box;}
+html.philips-tv #pgSchedule .sch-h{height:56px;box-sizing:border-box;}
+html.philips-tv #schWrap{position:absolute;top:56px;bottom:8px;left:0;right:0;min-height:0;box-sizing:border-box;}
+html.philips-tv #schGrid{display:flex;height:100%;min-height:0;gap:0;}
+html.philips-tv .sch-day{flex:1 1 0;min-width:0;height:100%;box-sizing:border-box;margin-right:6px;}
+html.philips-tv .sch-day:last-child{margin-right:0;}
+html.philips-tv .sch-dh{min-height:34px;letter-spacing:0;font-size:11px;}
+html.philips-tv .sch-items{display:block;overflow-x:hidden;}
+html.philips-tv .sch-item{width:100%;box-sizing:border-box;margin-bottom:6px;padding:0;}
+html.philips-tv .sch-item-img,html.philips-tv .sch-item-ph{height:80px;min-height:80px;aspect-ratio:auto;}
+html.philips-tv .sch-item-info{width:100%;box-sizing:border-box;}
 html.philips-tv #ctxBox{position:absolute;left:50%!important;top:50%!important;transform:translate(-50%,-50%);box-sizing:border-box;min-width:0;width:340px;max-width:90%;max-height:calc(100vh / 1.3 - 24px);overflow-y:auto;}
 html.philips-tv .ctx-hdr{padding:8px 12px;}
 html.philips-tv .ctx-poster{width:30px;height:42px;}
@@ -122,6 +133,3 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
-
-
-
