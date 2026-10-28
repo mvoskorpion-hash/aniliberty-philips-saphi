@@ -7,6 +7,7 @@ async function build(){
  const esbuild=require('./tooling/node_modules/esbuild');
  fs.mkdirSync(path.join(out,'js'),{recursive:true});
  let html=fs.readFileSync(path.join(source,'index.html'),'utf8');
+ html=html.replace("if(els[visIdx]) els[visIdx].classList.add('foc');", "if(els[visIdx]){els[visIdx].classList.add('foc');if(_isPhilips)els[visIdx].scrollIntoView(false);}");
  // The upstream empty-episode path references a spinner ID that does not exist.
  html=html.replace(/\$\('plySpinner'\)\.style\.display='none'; \/\/ actually show it\s*\$\('plySpin'\)\.style\.display='flex';/, "$('plySpin').style.display='none';");
  // SAPHI lacks these glyphs; use plain labels, including timeupdate-generated ones.
@@ -76,6 +77,11 @@ html.legacy-gap .track>.card{margin-right:10px;}
 html.legacy-gap #nav>*,html.legacy-gap #hdr-r>*{margin-right:12px;}
 html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
+html.philips-tv #ctxBox{position:absolute;left:50%!important;top:50%!important;transform:translate(-50%,-50%);box-sizing:border-box;min-width:0;width:340px;max-width:90%;max-height:calc(100vh / 1.3 - 24px);overflow-y:auto;}
+html.philips-tv .ctx-hdr{padding:8px 12px;}
+html.philips-tv .ctx-poster{width:30px;height:42px;}
+html.philips-tv .ctx-item{padding:8px 12px;line-height:18px;}
+html.philips-tv .ctx-sep{margin:2px 0;}
 html.philips-tv button svg{flex-shrink:0;}
 html.philips-tv button{white-space:nowrap;}
 
@@ -116,3 +122,6 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
+
+
+

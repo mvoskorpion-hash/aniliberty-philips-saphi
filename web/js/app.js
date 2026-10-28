@@ -4155,7 +4155,10 @@ function applyCtxFoc() {
     return !x.sep;
   }).length - 1;
   var els = _toConsumableArray(document.querySelectorAll('.ctx-item'));
-  if (els[visIdx]) els[visIdx].classList.add('foc');
+  if (els[visIdx]) {
+    els[visIdx].classList.add('foc');
+    if (_isPhilips) els[visIdx].scrollIntoView(false);
+  }
 }
 function ctxNavStep(dir) {
   // move ctxIdx skipping seps
