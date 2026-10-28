@@ -79,8 +79,8 @@ html.legacy-gap .c-foot>*{margin-right:5px;}
 html.philips-tv button svg{flex-shrink:0;}
 html.philips-tv button{white-space:nowrap;}
 
-html.philips-tv #collTabs{display:flex;flex-wrap:wrap;}
-html.philips-tv #collTabs .ctab{margin:4px;min-height:42px;}
+html.philips-tv #collTabs{display:flex;flex-wrap:nowrap;gap:0;width:100%;box-sizing:border-box;}
+html.philips-tv #collTabs .ctab{flex:1 1 0;min-width:0;box-sizing:border-box;margin:0 3px;min-height:42px;padding:7px 4px;font-size:13px;white-space:nowrap;}
 html.philips-tv .ply-row{display:flex;align-items:center;}
 html.philips-tv #plyOv{top:0;right:0;bottom:0;left:0;}
 html.philips-tv .ply-wrap{position:absolute;top:0;right:0;bottom:0;left:0;}
