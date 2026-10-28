@@ -78,7 +78,7 @@ html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
 html.philips-tv button svg{flex-shrink:0;}
 html.philips-tv button{white-space:nowrap;}
-html.philips-tv .foc{outline:3px solid #ff5262!important;outline-offset:2px;}
+
 html.philips-tv #collTabs{display:flex;flex-wrap:wrap;}
 html.philips-tv #collTabs .ctab{margin:4px;min-height:42px;}
 html.philips-tv .ply-row{display:flex;align-items:center;}
@@ -116,6 +116,3 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
-
-
-
