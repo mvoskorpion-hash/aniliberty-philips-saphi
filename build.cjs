@@ -6,7 +6,7 @@ async function build(){
  const preset=(await import('./tooling/node_modules/@babel/preset-env/lib/index.js')).default;
  const esbuild=require('./tooling/node_modules/esbuild');
  fs.mkdirSync(path.join(out,'js'),{recursive:true});
- let html=fs.readFileSync(path.join(source,'index.html'),'utf8');
+ let html=fs.readFileSync(path.join(source,'index.html'),'utf8').replace(/\r\n/g,'\n');
  html=html.replace("if(els[visIdx]) els[visIdx].classList.add('foc');", "if(els[visIdx]){els[visIdx].classList.add('foc');if(_isPhilips)els[visIdx].scrollIntoView(false);}");
  // The upstream empty-episode path references a spinner ID that does not exist.
  html=html.replace(/\$\('plySpinner'\)\.style\.display='none'; \/\/ actually show it\s*\$\('plySpin'\)\.style\.display='flex';/, "$('plySpin').style.display='none';");
@@ -32,6 +32,12 @@ const _isTizen=_isSamsung||_isPhilips;`);
  html=html.replace("if(_isTizen||typeof Hls!=='undefined'){ cb(); return; }", "if(_isSamsung||$('vid').canPlayType('application/vnd.apple.mpegurl')||typeof Hls!=='undefined'){ cb(); return; }");
  html=html.replace("s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js';", "s.src='js/hls.min.js';\n  s.onerror=()=>{ cb(); };");
  html=html.replace("if(!isTizen && typeof Hls!=='undefined' && Hls.isSupported()){", "if(!nativeHls && typeof Hls!=='undefined' && Hls.isSupported()){");
+ // Desktop browsers use MSE when available; native TV playback can fall back once.
+ html=html.replace('function ensureHls(cb){','function ensureHls(cb,force=false){');
+ html=html.replace("if(_isSamsung||$('vid').canPlayType('application/vnd.apple.mpegurl')||typeof Hls!=='undefined')", "if((!force&&(_isSamsung||(_isPhilips&&$('vid').canPlayType('application/vnd.apple.mpegurl'))))||typeof Hls!=='undefined')");
+ html=html.replace('function _loadVideo(url, startTime, ep){','function _loadVideo(url, startTime, ep, forceHls=false){');
+ html=html.replace("const nativeHls = v.canPlayType('application/vnd.apple.mpegurl') || isTizen;", "const nativeHls = !forceHls&&(v.canPlayType('application/vnd.apple.mpegurl') || isTizen)&&(_isPhilips||isTizen||!(typeof Hls!=='undefined'&&Hls.isSupported()));");
+ html=html.replace("v.addEventListener('error',()=>{\n      $('plySpin').style.display='none'; showCtrl();", "v.addEventListener('error',()=>{\n      v.removeEventListener('loadedmetadata',onReady);\n      const resume=v.currentTime||startTime||0;\n      ensureHls(()=>{if(v.getAttribute('src')!==url)return;if(typeof Hls!=='undefined'&&Hls.isSupported()){v.removeAttribute('src');v.load();_loadVideo(url,resume,ep,true);}else{$('plySpin').style.display='none';$('plyEpL').textContent='Не удалось воспроизвести поток в этом браузере';showCtrl();}},true);");
  // Every playback request must handle asynchronous cancellation by pause/seek.
  html=html.replaceAll("v.play().catch(()=>{});", "philipsPlay(v);");
  html=html.replaceAll("v.play();", "philipsPlay(v);");
@@ -133,3 +139,6 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
+
+
+

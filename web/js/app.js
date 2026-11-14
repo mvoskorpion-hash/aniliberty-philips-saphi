@@ -1412,7 +1412,8 @@ function focIdx(sel, idx) {
 }
 var _hlsLoaded = false;
 function ensureHls(cb) {
-  if (_isSamsung || $('vid').canPlayType('application/vnd.apple.mpegurl') || typeof Hls !== 'undefined') {
+  var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  if (!force && (_isSamsung || _isPhilips && $('vid').canPlayType('application/vnd.apple.mpegurl')) || typeof Hls !== 'undefined') {
     cb();
     return;
   }
@@ -3084,6 +3085,7 @@ function loadVideo(url, startTime, ep) {
   });
 }
 function _loadVideo(url, startTime, ep) {
+  var forceHls = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
   var v = $('vid');
   if (hlsInst) {
     hlsInst.destroy();
@@ -3093,7 +3095,7 @@ function _loadVideo(url, startTime, ep) {
   // Samsung Tizen TV поддерживает HLS нативно.
   // hls.js на Tizen падает из-за Web Workers в .wgt пакете.
   var isTizen = !!window.tizen || /Tizen/i.test(navigator.userAgent);
-  var nativeHls = v.canPlayType('application/vnd.apple.mpegurl') || isTizen;
+  var nativeHls = !forceHls && (v.canPlayType('application/vnd.apple.mpegurl') || isTizen) && (_isPhilips || isTizen || !(typeof Hls !== 'undefined' && Hls.isSupported()));
   if (!nativeHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
     // PC / Android — используем hls.js без воркера
     hlsInst = new Hls({
@@ -3138,8 +3140,20 @@ function _loadVideo(url, startTime, ep) {
     };
     v.addEventListener('loadedmetadata', _onReady);
     v.addEventListener('error', function () {
-      $('plySpin').style.display = 'none';
-      showCtrl();
+      v.removeEventListener('loadedmetadata', _onReady);
+      var resume = v.currentTime || startTime || 0;
+      ensureHls(function () {
+        if (v.getAttribute('src') !== url) return;
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+          v.removeAttribute('src');
+          v.load();
+          _loadVideo(url, resume, ep, true);
+        } else {
+          $('plySpin').style.display = 'none';
+          $('plyEpL').textContent = 'Не удалось воспроизвести поток в этом браузере';
+          showCtrl();
+        }
+      }, true);
     }, {
       once: true
     });
