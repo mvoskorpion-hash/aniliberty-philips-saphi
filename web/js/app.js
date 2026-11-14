@@ -65,6 +65,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   document.addEventListener('keydown', normalize, true);
   document.addEventListener('keyup', normalize, true);
 })();
+var _isPhilipsDevice = /Philips|NETTV|Saphi/i.test(navigator.userAgent);
 var _isSamsung = !!window.tizen || /Tizen/i.test(navigator.userAgent);
 var _isPhilips = /Philips|NETTV|Saphi/i.test(navigator.userAgent) || /[?&]tv=philips(?:&|$)/i.test(location.search);
 // Existing TV navigation and performance paths apply to both platforms.
@@ -1413,7 +1414,7 @@ function focIdx(sel, idx) {
 var _hlsLoaded = false;
 function ensureHls(cb) {
   var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-  if (!force && (_isSamsung || _isPhilips && $('vid').canPlayType('application/vnd.apple.mpegurl')) || typeof Hls !== 'undefined') {
+  if (!force && (_isSamsung || _isPhilipsDevice && $('vid').canPlayType('application/vnd.apple.mpegurl')) || typeof Hls !== 'undefined') {
     cb();
     return;
   }
@@ -3095,7 +3096,7 @@ function _loadVideo(url, startTime, ep) {
   // Samsung Tizen TV поддерживает HLS нативно.
   // hls.js на Tizen падает из-за Web Workers в .wgt пакете.
   var isTizen = !!window.tizen || /Tizen/i.test(navigator.userAgent);
-  var nativeHls = !forceHls && (v.canPlayType('application/vnd.apple.mpegurl') || isTizen) && (_isPhilips || isTizen || !(typeof Hls !== 'undefined' && Hls.isSupported()));
+  var nativeHls = !forceHls && (v.canPlayType('application/vnd.apple.mpegurl') || isTizen) && (_isPhilipsDevice || isTizen || !(typeof Hls !== 'undefined' && Hls.isSupported()));
   if (!nativeHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
     // PC / Android — используем hls.js без воркера
     hlsInst = new Hls({
@@ -6566,12 +6567,22 @@ try {
 function togglePlyFs() {
   var wrap = $('plyOv');
   if (!document.fullscreenElement) {
-    (wrap.requestFullscreen || wrap.webkitRequestFullscreen || wrap.mozRequestFullScreen).call(wrap);
+    var fn = wrap.requestFullscreen || wrap.webkitRequestFullscreen || wrap.mozRequestFullScreen;
+    if (fn) {
+      var p = fn.call(wrap);
+      if (p && p.catch) p.catch(function () {});
+    } else if ($('vid').webkitEnterFullscreen) {
+      $('vid').webkitEnterFullscreen();
+    }
   } else {
-    (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+    var _fn = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+    if (_fn) {
+      var _p = _fn.call(document);
+      if (_p && _p.catch) _p.catch(function () {});
+    }
   }
 }
-if (!_isTizen) {
+if (!_isSamsung && !_isPhilipsDevice) {
   $('pcFullscreen').addEventListener('click', togglePlyFs);
 } else {
   $('pcFullscreen').style.display = 'none';
