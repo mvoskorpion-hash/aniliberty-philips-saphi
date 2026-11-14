@@ -29,6 +29,7 @@ const _isTizen=_isSamsung||_isPhilips;`);
  html=html.replace("if(_isApp) document.body.classList.add('is-app');", "if(_isApp) document.body.classList.add('is-app');\nif(_isPhilips) document.documentElement.classList.add('philips-tv');");
  html=html.replace('<div class="ply-eps" id="plyEps"></div>', '');
  html=html.replace(/(<button class="pb" id="pcFullscreen"[\s\S]*?<\/button>\s*<\/div>)/, '$1\n<div class="ply-eps" id="plyEps"></div>');
+ html=html.replace(/(<button class="ply-qual-btn" id="pcQual"[\s\S]*?<\/button>)\s*([\s\S]*?<button class="pb" id="pcFullscreen"[\s\S]*?<\/button>)/, '<div class="ply-display-tools">$1<div class="ply-display-actions">$2</div></div>');
  html=html.replace("if(_isTizen||typeof Hls!=='undefined'){ cb(); return; }", "if(_isSamsung||$('vid').canPlayType('application/vnd.apple.mpegurl')||typeof Hls!=='undefined'){ cb(); return; }");
  html=html.replace("s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js';", "s.src='js/hls.min.js';\n  s.onerror=()=>{ cb(); };");
  html=html.replace("if(!isTizen && typeof Hls!=='undefined' && Hls.isSupported()){", "if(!nativeHls && typeof Hls!=='undefined' && Hls.isSupported()){");
@@ -90,6 +91,11 @@ html.legacy-gap .track>.card{margin-right:10px;}
 html.legacy-gap #nav>*,html.legacy-gap #hdr-r>*{margin-right:12px;}
 html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
+.ply-display-tools{margin-left:auto;display:flex;flex-direction:column;align-items:stretch;flex-shrink:0;}
+.ply-display-tools #pcQual{margin-left:0!important;width:100%;box-sizing:border-box;}
+.ply-display-actions{display:flex;justify-content:center;margin-top:6px;}
+.ply-display-actions .pb{width:38px!important;height:34px!important;margin:0 3px!important;border-radius:7px;background:rgba(255,255,255,.08);}
+.ply-display-actions .pb svg{width:18px;height:18px;}
 html.philips-tv #pgSchedule{position:relative;padding:0;box-sizing:border-box;}
 html.philips-tv #pgSchedule .sch-h{height:56px;box-sizing:border-box;}
 html.philips-tv #schWrap{position:absolute;top:56px;bottom:8px;left:0;right:0;min-height:0;box-sizing:border-box;}
@@ -146,6 +152,3 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
-
-
-

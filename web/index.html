@@ -755,6 +755,11 @@ html.legacy-gap .track>.card{margin-right:10px;}
 html.legacy-gap #nav>*,html.legacy-gap #hdr-r>*{margin-right:12px;}
 html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
+.ply-display-tools{margin-left:auto;display:flex;flex-direction:column;align-items:stretch;flex-shrink:0;}
+.ply-display-tools #pcQual{margin-left:0!important;width:100%;box-sizing:border-box;}
+.ply-display-actions{display:flex;justify-content:center;margin-top:6px;}
+.ply-display-actions .pb{width:38px!important;height:34px!important;margin:0 3px!important;border-radius:7px;background:rgba(255,255,255,.08);}
+.ply-display-actions .pb svg{width:18px;height:18px;}
 html.philips-tv #pgSchedule{position:relative;padding:0;box-sizing:border-box;}
 html.philips-tv #pgSchedule .sch-h{height:56px;box-sizing:border-box;}
 html.philips-tv #schWrap{position:absolute;top:56px;bottom:8px;left:0;right:0;min-height:0;box-sizing:border-box;}
@@ -1084,13 +1089,12 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
           <button class="pb" id="pcNext"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6zm8.5 0H18V6h-3.5z"/></svg></button>
           <span class="ply-time" id="plyTime">0:00 / 0:00</span>
           
-          <button class="ply-qual-btn" id="pcQual" style="margin-left:auto">1080p</button>
-          <button class="pb ply-fit-btn" id="pcFit" title="Растяжение">
+          <div class="ply-display-tools"><button class="ply-qual-btn" id="pcQual" style="margin-left:auto">1080p</button><div class="ply-display-actions"><button class="pb ply-fit-btn" id="pcFit" title="Растяжение">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M3 15h18" stroke-dasharray="3 3"/></svg>
           </button>
           <button class="pb" id="pcFullscreen" title="Полный экран">
             <svg id="pcFsIco" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
-          </button>
+          </button></div></div>
         </div>
 <div class="ply-eps" id="plyEps"></div>
       </div>
