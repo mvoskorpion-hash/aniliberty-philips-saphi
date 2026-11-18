@@ -74,11 +74,29 @@ const _isTizen=_isSamsung||_isPhilips;`);
  html=html.replace('const obs=new IntersectionObserver(entries=>{', "if(typeof IntersectionObserver==='undefined') return;\n  const obs=new IntersectionObserver(entries=>{");
  html=html.replace('if(_isTizen) el.scrollIntoView({block:', 'if(_isPhilips) el.scrollIntoView(false);\n  else if(_isTizen) el.scrollIntoView({block:');
  html=html.replace("if(k==='MediaPlayPause'||k==='Pause')", "if(k==='MediaPlay'){if(Z==='player'){philipsPlay($('vid'));e.preventDefault();}return;}\n  if(k==='MediaPause'){if(Z==='player'){$('vid').pause();e.preventDefault();}return;}\n  if(k==='MediaStop'){if(Z==='player'){closePlayer();e.preventDefault();}return;}\n  if(k==='MediaPlayPause'||k==='Pause')");
+ html=html.replace('<div class="ply-display-actions">','<button class="ply-qual-btn" id="pcEngine" title="Сменить плеер">Плеер: авто</button><div class="ply-display-actions">');
+ html=html.replace("'pcQual','pcFit'", "'pcQual','pcEngine','pcFit'");
+ html=html.replace(/(const PLY_BTNS_TV\s*=\s*\[[^\]]*?)('pcQual')/, '$1$2,\'pcEngine\'');
+ html=html.replace('ensureHls(()=>_loadVideo(url, startTime, ep));', "ensureHls(()=>{if(playerEngine==='hls'&&!(typeof Hls!=='undefined'&&Hls.isSupported())){playerEngine='auto';Store.set('philips_player','auto');updateEngineLabel();$('plyEpL').textContent='Альтернативный плеер недоступен; используется авто';}_loadVideo(url,startTime,ep,playerEngine==='hls');},playerEngine==='hls');");
+ html=html.replace("const nativeHls = !forceHls&&", "const nativeHls = playerEngine!=='hls'&&!forceHls&&");
+ html=html.replace('&&(_isPhilipsDevice||isTizen||!', "&&(playerEngine==='native'||_isPhilipsDevice||isTizen||!");
+ html=html.replace("// ── Player fullscreen", `let playerEngine=Store.get('philips_player','auto');
+if(!['auto','native','hls'].includes(playerEngine))playerEngine='auto';
+function updateEngineLabel(){$('pcEngine').textContent='Плеер: '+({auto:'авто',native:'встроенный',hls:'HLS.js'}[playerEngine]);}
+updateEngineLabel();
+$('pcEngine').addEventListener('click',()=>{
+ if(!currentEp)return;
+ const v=$('vid'),position=v.currentTime||0;
+ playerEngine=playerEngine==='hls'?'native':'hls';Store.set('philips_player',playerEngine);updateEngineLabel();
+ const url=currentEp[currentQual];if(url){v.pause();loadVideo(url.startsWith('http')?url:CDN+url,position,currentEp);}
+ showCtrl();
+});
+// ── Player fullscreen`);
  const match=html.match(/<script>([\s\S]*?)<\/script>/);
  const result=await babel.transformAsync(match[1],{presets:[[preset,{targets:{chrome:'38'},modules:false,useBuiltIns:false}]],comments:true});
  fs.writeFileSync(path.join(out,'js/app.js'),result.code);
  fs.copyFileSync(path.join(root,'philips-boot.js'),path.join(out,'js/boot.js'));
- html=html.replace(match[0],'<script src="js/boot.js?v=110"></script>\n<script src="js/polyfills.js?v=110" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=110" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
+ html=html.replace(match[0],'<script src="js/boot.js?v=111"></script>\n<script src="js/polyfills.js?v=111" onerror="philipsBoot.fail(\'Не загрузились polyfills.js\')"></script>\n<script src="js/app.js?v=111" onerror="philipsBoot.fail(\'Не загрузился app.js\')"></script>');
  html=html.replace('</style>', `
 /* Older SAPHI engines: readable layouts without CSS Grid or flex gap. */
 @supports not (display:grid){
@@ -93,6 +111,7 @@ html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
 .ply-display-tools{margin-left:auto;display:flex;flex-direction:column;align-items:stretch;flex-shrink:0;}
 .ply-display-tools #pcQual{margin-left:0!important;width:100%;box-sizing:border-box;}
+.ply-display-tools #pcEngine{margin:5px 0 0!important;font-size:12px;padding:6px 8px;}
 .ply-display-actions{display:flex;justify-content:center;margin-top:6px;}
 .ply-display-actions .pb{width:38px!important;height:34px!important;margin:0 3px!important;border-radius:7px;background:rgba(255,255,255,.08);}
 .ply-display-actions .pb svg{width:18px;height:18px;}
@@ -139,16 +158,18 @@ html.philips-tv .ply-back-btn{top:20px;left:4%;}
 html.philips-tv #skipBtn{right:4%;bottom:235px;}
 html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </style>`);
- html=html.replace('<script src="js/app.js?v=110"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=110"`);
+ html=html.replace('<script src="js/app.js?v=111"', `<script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>\n<script src="js/app.js?v=111"`);
  // Resolve CSS variables for engines predating custom properties.
  const vars={};html.replace(/--([\w-]+):([^;}]+)/g,(_,k,v)=>{if(!(k in vars))vars[k]=v;return _;});
  html=html.replace(/var\(--([\w-]+)\)/g,(m,k)=>vars[k]||m);
  fs.writeFileSync(path.join(out,'index.html'),html);
  fs.copyFileSync(path.join(source,'icon.png'),path.join(out,'icon.png'));
  await esbuild.build({stdin:{contents:"require('core-js/stable'); require('whatwg-fetch');",resolveDir:path.join(root,'tooling')},bundle:true,target:'es5',outfile:path.join(out,'js/polyfills.js')});
- const hls=await fetch('https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js');if(!hls.ok)throw Error('HLS download failed');
- fs.writeFileSync(path.join(out,'js/hls.min.js'),await hls.text());
+ if(!fs.existsSync(path.join(out,'js/hls.min.js'))){const hls=await fetch('https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js');if(!hls.ok)throw Error('HLS download failed');fs.writeFileSync(path.join(out,'js/hls.min.js'),await hls.text());}
  fs.writeFileSync(path.join(out,'UPSTREAM.txt'),'Source: https://github.com/CoreDip/anilibria-tizen-wgt\nCommit: d027ab80c83ee9eed22251e47e5db759d4bff0f3\nUpstream README declares MIT; repository contains no standalone LICENSE.\nAdaptation: Philips SAPHI, remote keys, legacy JS/CSS, MSX local launcher.\nBundled dependencies retain their license notices; core-js MIT, whatwg-fetch MIT, hls.js Apache-2.0.\n');
  console.log('Built '+out);
 }
 build().catch(e=>{console.error(e);process.exitCode=1;});
+
+
+

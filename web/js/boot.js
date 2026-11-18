@@ -72,7 +72,7 @@
     if(ready)return;
     var box=document.getElementById('philipsDiagnostic');
     if(!box){box=document.createElement('div');box.id='philipsDiagnostic';box.style.cssText='position:fixed;left:3%;right:3%;bottom:4%;z-index:999999;background:#161c2e;color:#fff;border:2px solid #e8272f;padding:18px;font:18px Arial;white-space:pre-wrap;';document.body.appendChild(box);}
-    box.textContent='AniLiberty Philips 1.0.10\n'+message+'\nПоследняя кнопка: '+lastKey;
+    box.textContent='AniLiberty Philips 1.0.11\n'+message+'\nПоследняя кнопка: '+lastKey;
     clearTimeout(diagnosticTimer);diagnosticTimer=setTimeout(dismiss,12000);
   }
   window.philipsBoot={

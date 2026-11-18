@@ -757,6 +757,7 @@ html.legacy-gap .c-foot>*{margin-right:5px;}
 /* Philips player: explicit edges and a separate episode strip. */
 .ply-display-tools{margin-left:auto;display:flex;flex-direction:column;align-items:stretch;flex-shrink:0;}
 .ply-display-tools #pcQual{margin-left:0!important;width:100%;box-sizing:border-box;}
+.ply-display-tools #pcEngine{margin:5px 0 0!important;font-size:12px;padding:6px 8px;}
 .ply-display-actions{display:flex;justify-content:center;margin-top:6px;}
 .ply-display-actions .pb{width:38px!important;height:34px!important;margin:0 3px!important;border-radius:7px;background:rgba(255,255,255,.08);}
 .ply-display-actions .pb svg{width:18px;height:18px;}
@@ -1089,7 +1090,7 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
           <button class="pb" id="pcNext"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6zm8.5 0H18V6h-3.5z"/></svg></button>
           <span class="ply-time" id="plyTime">0:00 / 0:00</span>
           
-          <div class="ply-display-tools"><button class="ply-qual-btn" id="pcQual" style="margin-left:auto">1080p</button><div class="ply-display-actions"><button class="pb ply-fit-btn" id="pcFit" title="Растяжение">
+          <div class="ply-display-tools"><button class="ply-qual-btn" id="pcQual" style="margin-left:auto">1080p</button><button class="ply-qual-btn" id="pcEngine" title="Сменить плеер">Плеер: авто</button><div class="ply-display-actions"><button class="pb ply-fit-btn" id="pcFit" title="Растяжение">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M3 15h18" stroke-dasharray="3 3"/></svg>
           </button>
           <button class="pb" id="pcFullscreen" title="Полный экран">
@@ -1110,9 +1111,9 @@ html.philips-tv #skipNextBtn{right:4%;bottom:285px;}
 </div>
 
 <!-- hls.js loaded on demand -->
-<script src="js/boot.js?v=110"></script>
-<script src="js/polyfills.js?v=110" onerror="philipsBoot.fail('Не загрузились polyfills.js')"></script>
+<script src="js/boot.js?v=111"></script>
+<script src="js/polyfills.js?v=111" onerror="philipsBoot.fail('Не загрузились polyfills.js')"></script>
 <script>var gapTest=document.createElement('div');gapTest.style.cssText='display:flex;flex-direction:column;row-gap:1px;position:absolute';gapTest.appendChild(document.createElement('div'));gapTest.appendChild(document.createElement('div'));document.body.appendChild(gapTest);if(gapTest.scrollHeight!==1)document.documentElement.className+=' legacy-gap';gapTest.parentNode.removeChild(gapTest);</script>
-<script src="js/app.js?v=110" onerror="philipsBoot.fail('Не загрузился app.js')"></script>
+<script src="js/app.js?v=111" onerror="philipsBoot.fail('Не загрузился app.js')"></script>
 </body>
 </html>

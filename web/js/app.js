@@ -73,8 +73,8 @@ var _isTizen = _isSamsung || _isPhilips;
 var _isApp = new URLSearchParams(location.search).has('app');
 if (_isApp) document.body.classList.add('is-app');
 if (_isPhilips) document.documentElement.classList.add('philips-tv');
-var PLY_BTNS_PC = ['pcPrev', 'pcPlay', 'pcNext', 'pcQual', 'pcFit', 'pcFullscreen'];
-var PLY_BTNS_TV = ['pcPrev', 'pcPlay', 'pcNext', 'pcQual'];
+var PLY_BTNS_PC = ['pcPrev', 'pcPlay', 'pcNext', 'pcQual', 'pcEngine', 'pcFit', 'pcFullscreen'];
+var PLY_BTNS_TV = ['pcPrev', 'pcPlay', 'pcNext', 'pcQual', 'pcEngine'];
 var PLY_BTNS = _isTizen ? PLY_BTNS_TV : PLY_BTNS_PC;
 if (_isTizen) {
   document.documentElement.classList.add('tizen-tv');
@@ -3082,8 +3082,14 @@ function buildEpStrip() {
 }
 function loadVideo(url, startTime, ep) {
   ensureHls(function () {
-    return _loadVideo(url, startTime, ep);
-  });
+    if (playerEngine === 'hls' && !(typeof Hls !== 'undefined' && Hls.isSupported())) {
+      playerEngine = 'auto';
+      Store.set('philips_player', 'auto');
+      updateEngineLabel();
+      $('plyEpL').textContent = 'Альтернативный плеер недоступен; используется авто';
+    }
+    _loadVideo(url, startTime, ep, playerEngine === 'hls');
+  }, playerEngine === 'hls');
 }
 function _loadVideo(url, startTime, ep) {
   var forceHls = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -3096,7 +3102,7 @@ function _loadVideo(url, startTime, ep) {
   // Samsung Tizen TV поддерживает HLS нативно.
   // hls.js на Tizen падает из-за Web Workers в .wgt пакете.
   var isTizen = !!window.tizen || /Tizen/i.test(navigator.userAgent);
-  var nativeHls = !forceHls && (v.canPlayType('application/vnd.apple.mpegurl') || isTizen) && (_isPhilipsDevice || isTizen || !(typeof Hls !== 'undefined' && Hls.isSupported()));
+  var nativeHls = playerEngine !== 'hls' && !forceHls && (v.canPlayType('application/vnd.apple.mpegurl') || isTizen) && (playerEngine === 'native' || _isPhilipsDevice || isTizen || !(typeof Hls !== 'undefined' && Hls.isSupported()));
   if (!nativeHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
     // PC / Android — используем hls.js без воркера
     hlsInst = new Hls({
@@ -6562,7 +6568,30 @@ try {
     applyFit();
   }
 } catch (_) {}
-
+var playerEngine = Store.get('philips_player', 'auto');
+if (!['auto', 'native', 'hls'].includes(playerEngine)) playerEngine = 'auto';
+function updateEngineLabel() {
+  $('pcEngine').textContent = 'Плеер: ' + {
+    auto: 'авто',
+    native: 'встроенный',
+    hls: 'HLS.js'
+  }[playerEngine];
+}
+updateEngineLabel();
+$('pcEngine').addEventListener('click', function () {
+  if (!currentEp) return;
+  var v = $('vid'),
+    position = v.currentTime || 0;
+  playerEngine = playerEngine === 'hls' ? 'native' : 'hls';
+  Store.set('philips_player', playerEngine);
+  updateEngineLabel();
+  var url = currentEp[currentQual];
+  if (url) {
+    v.pause();
+    loadVideo(url.startsWith('http') ? url : CDN + url, position, currentEp);
+  }
+  showCtrl();
+});
 // ── Player fullscreen ─────────────────────────────────────────────────
 function togglePlyFs() {
   var wrap = $('plyOv');
