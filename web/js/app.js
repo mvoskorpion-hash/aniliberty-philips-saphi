@@ -1433,11 +1433,11 @@ function ensureHls(cb) {
   };
   document.head.appendChild(s);
 }
-var YEAR_MIN = 1990,
+var YEAR_MIN = 1900,
   YEAR_MAX = new Date().getFullYear();
 window.yearState = {
-  from: 2000,
-  to: YEAR_MAX
+  from: null,
+  to: null
 };
 function updateYearDisplay() {
   $('fYearFromVal').textContent = yearState.from ? String(yearState.from) : '—';
@@ -2156,8 +2156,8 @@ $('fltReset').addEventListener('click', function () {
   catQuery = '';
   $('catQ').value = '';
   window.yearState = {
-    from: 2000,
-    to: YEAR_MAX
+    from: null,
+    to: null
   };
   updateYearDisplay();
   document.querySelectorAll('.fchip.sel').forEach(function (c) {

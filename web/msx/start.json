@@ -1,5 +1,5 @@
 {
   "name": "AniLiberty Philips SAPHI",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "parameter": "content:https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/msx/content.json"
 }
