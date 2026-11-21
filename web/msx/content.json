@@ -1,6 +1,6 @@
 {
   "type": "list",
-  "headline": "AniLiberty Philips",
+  "headline": "Анимэ",
   "template": {
     "type": "separate",
     "layout": "0,0,4,3",
@@ -13,6 +13,13 @@
       "title": "AniLiberty",
       "image": "https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/icon.png",
       "action": "link:https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips&v=112"
+    },
+    {
+      "title": "AnimeON",
+      "icon": "movie",
+      "iconSize": "large",
+      "color": "msx-blue",
+      "action": "link:https://animeon.cc/"
     }
   ]
 }
