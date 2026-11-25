@@ -19,7 +19,7 @@
       "icon": "movie",
       "iconSize": "large",
       "color": "msx-blue",
-      "action": "link:https://animeon.cc/tv"
+      "action": "link:https://anime-tv-api.skorpionmwo.workers.dev/"
     }
   ]
 }
