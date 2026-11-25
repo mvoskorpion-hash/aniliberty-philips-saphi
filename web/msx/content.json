@@ -15,11 +15,11 @@
       "action": "link:https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips&v=112"
     },
     {
-      "title": "AnimeON",
+      "title": "YummyAnime",
       "icon": "movie",
       "iconSize": "large",
       "color": "msx-blue",
-      "action": "link:https://anime-tv-api.skorpionmwo.workers.dev/"
+      "action": "link:https://old.yummyani.me/"
     }
   ]
 }
