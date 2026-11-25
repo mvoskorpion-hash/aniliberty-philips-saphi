@@ -16,9 +16,8 @@
     },
     {
       "title": "YummyAnime",
-      "icon": "movie",
-      "iconSize": "large",
-      "color": "msx-blue",
+      "image": "https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/yummyanime-logo.png",
+      "imageFiller": "fit",
       "action": "link:https://old.yummyani.me/"
     }
   ]
