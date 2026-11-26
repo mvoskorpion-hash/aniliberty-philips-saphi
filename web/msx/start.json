@@ -1,5 +1,5 @@
 {
   "name": "Аниме",
-  "version": "1.0.28",
+  "version": "1.0.29",
   "parameter": "content:https://mvoskorpion-hash.github.io/anime-msx/msx/content.json"
 }
