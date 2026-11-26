@@ -3,7 +3,7 @@ var API='https://api.yani.tv',limit=30,offset=0,catalogMode='catalog',items=[],v
 function $(id){return document.getElementById(id)}
 function message(s){$('status').textContent=s}
 function focusFirst(){var b=$('grid').querySelector('button');if(b)b.focus();else $('back').focus()}
-function resetGrid(title){$('releaseCard').hidden=true;$('heading').hidden=false;$('heading').textContent=title;$('grid').textContent='';$('description').textContent='';$('more').hidden=true}
+function resetGrid(title){$('grid').className='';$('releaseCard').hidden=true;$('heading').hidden=false;$('heading').textContent=title;$('grid').textContent='';$('description').textContent='';$('more').hidden=true}
 function button(text,fn,cls){var b=document.createElement('button');b.className=cls||'choice';b.textContent=text;b.onclick=fn;$('grid').appendChild(b);return b}
 function safeUrl(raw){if(typeof raw!=='string')return '';var a=document.createElement('a');a.href=raw.indexOf('//')===0?'https:'+raw:raw;return a.protocol==='https:'?a.href:''}
 function origin(url){var a=document.createElement('a');a.href=url;return a.protocol+'//'+a.host}
@@ -38,7 +38,13 @@ function showReleaseDetails(){
   $('releaseCard').hidden=false;
 }
 function renderPlayers(){view='players';resetGrid(release.title);showReleaseDetails();players.forEach(function(p){button(p.name.replace(/^Плеер\s+/,'')+' · озвучек: '+p.groups.length,function(){chosenPlayer=p;group=null;renderVoices()})});message(players.length?'Выберите плеер':'Источник не предоставил доступные серии для этого релиза');focusChoice(players.indexOf(chosenPlayer))}
-function renderVoices(){view='voices';resetGrid(release.title);$('description').textContent=chosenPlayer.name+' → Озвучка';chosenPlayer.groups.forEach(function(g){button(g.voice+' · серий: '+g.videos.length,function(){group=g;renderEpisodes()})});message('Выберите озвучку');focusChoice(chosenPlayer.groups.indexOf(group))}
+function renderVoices(){view='voices';resetGrid(release.title);$('description').textContent=chosenPlayer.name+' → Озвучка';$('grid').className='voice-grid';
+chosenPlayer.groups.forEach(function(g){
+  var choice=button('',function(){group=g;renderEpisodes()},'choice voice-choice');
+  var name=document.createElement('span'),count=document.createElement('small');
+  name.textContent=g.voice;count.textContent='серий: '+g.videos.length;
+  choice.appendChild(name);choice.appendChild(document.createTextNode(' '));choice.appendChild(count);
+});message('Выберите озвучку');focusChoice(chosenPlayer.groups.indexOf(group))}
 function renderEpisodes(){view='episodes';resetGrid(release.title);$('description').textContent=group.key;group.videos.sort(function(a,b){return Number(a.index||a.number)-Number(b.index||b.number)}).forEach(function(v){button('Серия '+v.number,function(){play(v)},'choice episode')});message('Выберите серию');focusFirst()}
 function command(method,extra){if(!isKodik&&!isCvh&&!isAksor)return;var value={method:method};if(extra)Object.keys(extra).forEach(function(k){value[k]=extra[k]});var f=$('player');if(f&&f.contentWindow)f.contentWindow.postMessage(isAksor?(method==='seek'?{key:'player_seek',value:value.seconds}:{key:method==='play'?'player_play':'player_pause'}):isCvh?value:{key:'kodik_player_api',value:value},playerOrigin)}
 
