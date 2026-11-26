@@ -56,6 +56,12 @@ function addEpisode(list,video){
   list.push(video);
 }
 var startupTimer, panelTimer;
+function updatePlayIcon(playing){
+  var toggle=$('toggle'),label=playing?'Пауза':'Воспроизвести';
+  toggle.className=playing?'is-playing':'';
+  toggle.setAttribute('aria-label',label);
+  toggle.title=label;
+}
 function hidePanel(){
   clearTimeout(panelTimer);
   $('controls').hidden=true;
@@ -106,7 +112,7 @@ function chooseEpisodeSource(){
   focusFirst();
 }
 
-function play(v){var url=safeUrl(v.iframe_url);if(!url){message('Нет доступной ссылки плеера');return}current=v;view='player';watchStartup();position=0;duration=0;paused=true;playerOrigin=origin(url);isKodik=/^https:\/\/(?:[a-z0-9-]+\.)?(?:kodikplayer\.com|kodik\.info|kodik\.biz)$/.test(playerOrigin);isCvh=(Number(v.data&&v.data.player_id)===3||Number(v.data&&v.data.player_id)===8)&&playerOrigin==='https://ru.yummyani.me';isAksor=Number(v.data&&v.data.player_id)===1&&playerOrigin==='https://player.aksor.tv';$('frameHolder').textContent='';var f=document.createElement('iframe');f.id='player';f.title='Видео';f.tabIndex=-1;f.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');f.src=url;f.onload=function(){if(f!==$('player'))return;if(isKodik||isCvh||isAksor)command('play');else $('playerState').textContent='Для запуска используйте панель источника.'};$('frameHolder').appendChild(f);$('screen').hidden=false;document.body.className='playing';$('playingTitle').textContent=release.title+' · серия '+v.number+' · '+(v.data&&v.data.dubbing||'');['toggle','rewind','forward'].forEach(function(id){$(id).disabled=!(isKodik||isCvh||isAksor)});$('toggle').textContent='Воспроизвести';$('playerHint').textContent=(isKodik||isCvh||isAksor)?'OK — выбор · Назад — к сериям · кнопка «Панель плеера» — встроенное меню':'Управление видео — в панели выбранного плеера. Назад — к сериям.';var index=group.videos.indexOf(v);$('previous').disabled=index<=0;$('next').disabled=index>=group.videos.length-1;hidePanel()}
+function play(v){var url=safeUrl(v.iframe_url);if(!url){message('Нет доступной ссылки плеера');return}current=v;view='player';watchStartup();position=0;duration=0;paused=true;playerOrigin=origin(url);isKodik=/^https:\/\/(?:[a-z0-9-]+\.)?(?:kodikplayer\.com|kodik\.info|kodik\.biz)$/.test(playerOrigin);isCvh=(Number(v.data&&v.data.player_id)===3||Number(v.data&&v.data.player_id)===8)&&playerOrigin==='https://ru.yummyani.me';isAksor=Number(v.data&&v.data.player_id)===1&&playerOrigin==='https://player.aksor.tv';$('frameHolder').textContent='';var f=document.createElement('iframe');f.id='player';f.title='Видео';f.tabIndex=-1;f.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');f.src=url;f.onload=function(){if(f!==$('player'))return;if(isKodik||isCvh||isAksor)command('play');else $('playerState').textContent='Для запуска используйте панель источника.'};$('frameHolder').appendChild(f);$('screen').hidden=false;document.body.className='playing';$('playingTitle').textContent=release.title+' · серия '+v.number+' · '+(v.data&&v.data.dubbing||'');['toggle','rewind','forward'].forEach(function(id){$(id).disabled=!(isKodik||isCvh||isAksor)});updatePlayIcon(false);$('playerHint').textContent=(isKodik||isCvh||isAksor)?'OK — выбор · Назад — к сериям · кнопка «Панель плеера» — встроенное меню':'Управление видео — в панели выбранного плеера. Назад — к сериям.';var index=group.videos.indexOf(v);$('previous').disabled=index<=0;$('next').disabled=index>=group.videos.length-1;hidePanel()}
 function closePlayer(){clearTimeout(panelTimer);stopStartupTimer();$('frameHolder').textContent='';$('screen').hidden=true;document.body.className='';if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}renderEpisodes();var bs=$('grid').querySelectorAll('button'),i=group.videos.indexOf(current);if(bs[i])bs[i].focus()}
 function back(){if(view==='player'){closePlayer();return}if(pending){++requestId;pending.abort();pending=null;busy=false}if(view==='sources'){renderEpisodes();return}if(view==='episodes'){renderVoices();return}if(view==='voices'){renderPlayers();return}if(view==='players'){view='catalog';renderCards();var bs=$('grid').querySelectorAll('button');if(bs[catalogFocus])bs[catalogFocus].focus();return}if(window.history.length>1)window.history.back()}
 function seek(delta){command('seek',{seconds:Math.max(0,duration?Math.min(duration,position+delta):position+delta)})}
@@ -116,7 +122,7 @@ document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagN
   var canScroll=k===38?synopsis.scrollTop>0:synopsis.scrollTop+synopsis.clientHeight<synopsis.scrollHeight-1;
   if(canScroll){e.preventDefault();synopsis.scrollTop+=(k===38?-1:1)*Math.max(36,Math.floor(synopsis.clientHeight*.65));return}
 }if(k>=37&&k<=40){e.preventDefault();move(k)}else if(k===13&&e.target.tagName==='BUTTON'){e.preventDefault();e.target.click()}});
-window.addEventListener('message',function(e){var f=$('player');if(!f||e.source!==f.contentWindow||e.origin!==playerOrigin||!e.data||typeof e.data!=='object')return;var d=e.data;if((isCvh||isAksor)&&typeof d.key==='string'&&d.key.indexOf('player_')===0)d={key:'kodik_'+d.key,value:d.value};if(d.key==='kodik_player_time_update'&&typeof d.value==='number')position=d.value;else if(d.key==='kodik_player_duration_update'&&typeof d.value==='number')duration=d.value;else if(d.key==='kodik_player_play'||d.key==='kodik_player_video_started'){stopStartupTimer();$('playerState').textContent='';paused=false;if(!$('controls').hidden)showPanel();$('toggle').textContent='Пауза'}else if(d.key==='kodik_player_pause'){paused=true;showPanel();$('toggle').textContent='Воспроизвести'}});
+window.addEventListener('message',function(e){var f=$('player');if(!f||e.source!==f.contentWindow||e.origin!==playerOrigin||!e.data||typeof e.data!=='object')return;var d=e.data;if((isCvh||isAksor)&&typeof d.key==='string'&&d.key.indexOf('player_')===0)d={key:'kodik_'+d.key,value:d.value};if(d.key==='kodik_player_time_update'&&typeof d.value==='number')position=d.value;else if(d.key==='kodik_player_duration_update'&&typeof d.value==='number')duration=d.value;else if(d.key==='kodik_player_play'||d.key==='kodik_player_video_started'){stopStartupTimer();$('playerState').textContent='';paused=false;if(!$('controls').hidden)showPanel();updatePlayIcon(true)}else if(d.key==='kodik_player_pause'){paused=true;showPanel();updatePlayIcon(false)}});
 $('top').onclick=function(){catalogMode='top';$('query').value='';catalog(true)};
 $('random').onclick=function(){
   request('/anime?limit=1&sort=random',function(list){
@@ -125,6 +131,9 @@ $('random').onclick=function(){
   });
 };
 $('back').onclick=back;$('catalog').onclick=function(){if(view==='player')closePlayer();catalogMode='catalog';$('query').value='';catalog(true)};$('searchForm').onsubmit=function(e){e.preventDefault();catalogMode='catalog';catalog(true)};$('more').onclick=function(){catalog(false)};$('exitPlayer').onclick=closePlayer;
+$('controls').addEventListener('focusin',function(e){
+  if(e.target.tagName==='BUTTON')$('playerHint').textContent=e.target.getAttribute('aria-label');
+});
 $('hidePanel').onclick=hidePanel;
 $('showPanel').onclick=showPanel;
 $('changePlayer').onclick=chooseEpisodeSource;
