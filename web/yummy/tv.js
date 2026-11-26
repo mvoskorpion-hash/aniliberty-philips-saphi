@@ -3,7 +3,7 @@ var API='https://api.yani.tv',limit=30,offset=0,catalogMode='catalog',items=[],v
 function $(id){return document.getElementById(id)}
 function message(s){$('status').textContent=s}
 function focusFirst(){var b=$('grid').querySelector('button');if(b)b.focus();else $('back').focus()}
-function resetGrid(title){$('rating').hidden=true;$('details').hidden=true;$('synopsis').hidden=true;$('heading').textContent=title;$('grid').textContent='';$('description').textContent='';$('more').hidden=true}
+function resetGrid(title){$('releaseCard').hidden=true;$('heading').hidden=false;$('heading').textContent=title;$('grid').textContent='';$('description').textContent='';$('more').hidden=true}
 function button(text,fn,cls){var b=document.createElement('button');b.className=cls||'choice';b.textContent=text;b.onclick=fn;$('grid').appendChild(b);return b}
 function safeUrl(raw){if(typeof raw!=='string')return '';var a=document.createElement('a');a.href=raw.indexOf('//')===0?'https:'+raw:raw;return a.protocol==='https:'?a.href:''}
 function origin(url){var a=document.createElement('a');a.href=url;return a.protocol+'//'+a.host}
@@ -22,16 +22,20 @@ function showReleaseDetails(){
   $('rating').textContent=score?'Рейтинг YummyAnime · '+score+' / 10':'';
   $('rating').hidden=!score;
   $('synopsis').textContent=String(release.description||'').replace(/<[^>]*>/g,'').trim();
-  $('details').hidden=!$('synopsis').textContent;
-  $('details').textContent='Описание';
-  $('details').setAttribute('aria-expanded','false');
+  $('synopsis').hidden=!$('synopsis').textContent;
+  var poster=$('releasePoster');
+  var image=safeUrl(release.poster&&(release.poster.big||release.poster.fullsize||release.poster.medium));
+  poster.hidden=!image;
+  poster.onerror=function(){poster.hidden=true};
+  if(image)poster.src=image;
+  else poster.removeAttribute('src');
+  $('releaseTitle').textContent=release.title;
+  var meta=[release.year,release.type&&release.type.name,release.anime_status&&release.anime_status.title].filter(Boolean);
+  $('releaseMeta').textContent=meta.join(' · ');
+  $('releaseMeta').hidden=!meta.length;
+  $('heading').hidden=true;
+  $('releaseCard').hidden=false;
 }
-$('details').onclick=function(){
-  var synopsis=$('synopsis');
-  synopsis.hidden=!synopsis.hidden;
-  this.textContent=synopsis.hidden?'Описание':'Свернуть описание';
-  this.setAttribute('aria-expanded',String(!synopsis.hidden));
-};
 function renderPlayers(){view='players';resetGrid(release.title);showReleaseDetails();players.forEach(function(p){button(p.name.replace(/^Плеер\s+/,'')+' · озвучек: '+p.groups.length,function(){chosenPlayer=p;group=null;renderVoices()})});message(players.length?'Выберите плеер':'Источник не предоставил доступные серии для этого релиза');focusChoice(players.indexOf(chosenPlayer))}
 function renderVoices(){view='voices';resetGrid(release.title);$('description').textContent=chosenPlayer.name+' → Озвучка';chosenPlayer.groups.forEach(function(g){button(g.voice+' · серий: '+g.videos.length,function(){group=g;renderEpisodes()})});message('Выберите озвучку');focusChoice(chosenPlayer.groups.indexOf(group))}
 function renderEpisodes(){view='episodes';resetGrid(release.title);$('description').textContent=group.key;group.videos.sort(function(a,b){return Number(a.index||a.number)-Number(b.index||b.number)}).forEach(function(v){button('Серия '+v.number,function(){play(v)},'choice episode')});message('Выберите серию');focusFirst()}

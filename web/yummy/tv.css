@@ -15,7 +15,15 @@ input{background:#131214}
 .card{position:relative}
 .card .score{position:absolute;top:10px;right:10px;padding:5px 9px;background:#a8323e;color:#fff;border-radius:5px;font-size:19px}
 #rating{color:#ff898a;font-weight:bold;margin:0 0 14px}
-#details{margin-bottom:14px}
+
 #synopsis{max-width:1000px;line-height:1.5;margin:0 0 24px;color:#eee}
 
 header{flex-wrap:wrap}header nav{display:flex;flex-wrap:wrap;gap:10px}@media(max-width:1250px){header form{order:2;flex-basis:100%}}
+
+#releaseCard{display:flex;align-items:flex-start;padding:22px;margin:12px 0 24px;background:#242225;border:1px solid #42373d;border-radius:12px}
+#releasePoster{width:clamp(120px,18vw,225px);height:auto;flex:none;border-radius:8px;margin-right:22px}
+.release-info{min-width:0}
+#releaseTitle{margin:0 0 10px}
+#releaseMeta{margin:0 0 12px;color:#d0c5ca}
+#releaseCard #synopsis{margin-bottom:0;overflow-wrap:break-word}
+@media(max-width:600px){#releaseCard{display:block}#releasePoster{margin-bottom:14px}}
