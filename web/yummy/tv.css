@@ -74,8 +74,8 @@ header{flex-wrap:wrap}header nav{display:flex;flex-wrap:wrap;gap:10px}@media(max
 #screen,#frameHolder,#frameHolder iframe{top:0;right:0;bottom:0;left:0}#frameHolder{position:absolute;width:100%;height:100%}
 
 #grid.voice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
-#grid .voice-choice{width:100%;max-width:none;min-width:0;margin:0;padding:8px 12px;min-height:52px;font-size:18px;overflow-wrap:break-word}
+#grid .voice-choice{width:100%;max-width:none;min-width:0;margin:0;padding:8px 12px;min-height:52px;overflow-wrap:break-word}
 .voice-choice span,.voice-choice small{display:block}
 .voice-choice small{font-size:.75em;color:#d0c5ca}
 @media(max-width:1050px){#grid.voice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:600px){#grid.voice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#grid .voice-choice{font-size:16px}}
+@media(max-width:600px){#grid.voice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
