@@ -5,3 +5,17 @@
 #playerState{margin:10px 0 0;font-size:18px;color:#ffcc88}#playerState:empty{display:none}#controls{max-height:55vh;overflow:auto}
 
 #showPanel{position:absolute;right:20px;bottom:16px;z-index:2;font-size:16px;background:#141c2b}#showPanel:focus{outline:none}
+
+html,body{background:#181719;color:#fff}
+header,footer,#controls,#showPanel{background:#242225}
+header{border-bottom:2px solid #ff6568}
+button,input,.card{background:#332e32}
+input{background:#131214}
+#searchForm button{background:#a8323e}
+.card{position:relative}
+.card .score{position:absolute;top:10px;right:10px;padding:5px 9px;background:#a8323e;color:#fff;border-radius:5px;font-size:19px}
+#rating{color:#ff898a;font-weight:bold;margin:0 0 14px}
+#details{margin-bottom:14px}
+#synopsis{max-width:1000px;line-height:1.5;margin:0 0 24px;color:#eee}
+
+header{flex-wrap:wrap}header nav{display:flex;flex-wrap:wrap;gap:10px}@media(max-width:1250px){header form{order:2;flex-basis:100%}}
