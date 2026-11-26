@@ -11,14 +11,14 @@
   "items": [
     {
       "title": "AniLiberty",
-      "image": "https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/icon.png",
-      "action": "link:https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips&v=112"
+      "image": "https://mvoskorpion-hash.github.io/anime-msx/icon.png",
+      "action": "link:https://mvoskorpion-hash.github.io/anime-msx/?tv=philips&v=112"
     },
     {
       "title": "YummyAnime",
-      "image": "https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/yummyanime-logo.png",
+      "image": "https://mvoskorpion-hash.github.io/anime-msx/yummyanime-logo.png",
       "imageFiller": "fit",
-      "action": "link:https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/yummy/?v=9"
+      "action": "link:https://mvoskorpion-hash.github.io/anime-msx/yummy/?v=9"
     }
   ]
 }

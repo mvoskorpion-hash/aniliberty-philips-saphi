@@ -4,7 +4,7 @@
 
 Приложение размещено на **GitHub Pages**: постоянно включённый компьютер, локальный сервер и установка Tizen-виджета не нужны.
 
-[Открыть AniLiberty](https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips) · [Открыть YummyAnime](https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/yummy/) · [Сообщить о проблеме](https://github.com/mvoskorpion-hash/aniliberty-philips-saphi/issues)
+[Открыть AniLiberty](https://mvoskorpion-hash.github.io/anime-msx/?tv=philips) · [Открыть YummyAnime](https://mvoskorpion-hash.github.io/anime-msx/yummy/) · [Сообщить о проблеме](https://github.com/mvoskorpion-hash/anime-msx/issues)
 
 ## Возможности
 
@@ -21,25 +21,25 @@
 
 1. Откройте **MediaStationX** на телевизоре.
 2. Перейдите в **Settings → Start Parameter → Setup**.
-3. Введите короткий параметр:
+3. Введите параметр запуска:
 
    ```text
-   id:trl:2236r8ja
+   https://mvoskorpion-hash.github.io/anime-msx/msx/start.json
    ```
 
 4. Включите **HTTPS** — значок замка должен быть активен.
 5. Подтвердите настройку и выберите плитку **AniLiberty** или **YummyAnime**.
 
-Короткий параметр ведёт к файлу запуска этого репозитория. При обновлении приложения менять его не нужно.
+Параметр ведёт к файлу запуска этого репозитория. При обновлении приложения менять его не нужно.
 
-Если короткая ссылка недоступна, используйте [прямую ссылку на файл запуска MSX](https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/msx/start.json).
+Для проверки откройте [прямую ссылку на файл запуска MSX](https://mvoskorpion-hash.github.io/anime-msx/msx/start.json).
 
 ## Запуск через браузер
 
 Откройте в браузере телевизора:
 
 ```text
-https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips
+https://mvoskorpion-hash.github.io/anime-msx/?tv=philips
 ```
 
 Параметр `?tv=philips` включает режим Philips, в том числе когда браузер не сообщает модель телевизора.
@@ -73,7 +73,7 @@ https://mvoskorpion-hash.github.io/aniliberty-philips-saphi/?tv=philips
 
 - Проверьте интернет на телевизоре и активный HTTPS в настройке MSX.
 - Попробуйте открыть приложение через браузер и выбрать другое качество видео.
-- [Создайте issue](https://github.com/mvoskorpion-hash/aniliberty-philips-saphi/issues), указав модель телевизора, способ запуска, название и номер серии, выбранное качество и текст ошибки. Фото экрана поможет воспроизвести проблему.
+- [Создайте issue](https://github.com/mvoskorpion-hash/anime-msx/issues), указав модель телевизора, способ запуска, название и номер серии, выбранное качество и текст ошибки. Фото экрана поможет воспроизвести проблему.
 
 В версии **1.0.8** расширена замена неподдерживаемых значков на SVG, исправлены обработчик обновления позиции видео и повторное подключение кнопки полного экрана. Сведения о проверках и ограничениях — в [QA.md](QA.md).
 
