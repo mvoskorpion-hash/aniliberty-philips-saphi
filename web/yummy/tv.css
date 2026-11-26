@@ -3,3 +3,5 @@
 #screen{flex-direction:column}body.playing #screen{display:flex}#frameHolder{position:relative;inset:auto;flex:1;min-height:0;height:auto}#controls{position:relative;flex:none;z-index:1;background:#141c2b}#frameHolder iframe{top:0;left:0}
 
 #playerState{margin:10px 0 0;font-size:18px;color:#ffcc88}#playerState:empty{display:none}#controls{max-height:55vh;overflow:auto}
+
+#showPanel{position:absolute;right:20px;bottom:16px;z-index:2;font-size:16px;background:#141c2b}#showPanel:focus{outline:none}
