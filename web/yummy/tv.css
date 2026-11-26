@@ -31,3 +31,5 @@ header{flex-wrap:wrap}header nav{display:flex;flex-wrap:wrap;gap:10px}@media(max
 .card img{height:auto;aspect-ratio:2 / 3;object-fit:cover}@supports not (aspect-ratio:2 / 3){.card img{height:240px}}.card .card-year{min-height:0;padding:0 12px 12px;color:#d0c5ca;font-size:17px}.card span:not(.card-year){min-height:0;line-height:1.25;overflow-wrap:break-word}
 
 #grid + #releaseCard{margin-top:24px}
+
+#releaseCard #synopsis{max-height:24vh;overflow-y:auto;padding-right:12px}#synopsis:focus{outline:2px solid #ff686b;outline-offset:4px}#releasePoster{max-height:34vh;object-fit:contain}
