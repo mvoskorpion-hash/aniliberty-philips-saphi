@@ -46,7 +46,7 @@ chosenPlayer.groups.forEach(function(g){
   choice.appendChild(name);choice.appendChild(document.createTextNode(' '));choice.appendChild(count);
 });message('Выберите озвучку');focusChoice(chosenPlayer.groups.indexOf(group))}
 function renderEpisodes(){view='episodes';resetGrid(release.title);$('description').textContent=group.key;group.videos.sort(function(a,b){return Number(a.index||a.number)-Number(b.index||b.number)}).forEach(function(v){button('Серия '+v.number,function(){play(v)},'choice episode')});message('Выберите серию');focusFirst()}
-function command(method,extra){if(!isKodik&&!isCvh&&!isAksor)return;var value={method:method};if(extra)Object.keys(extra).forEach(function(k){value[k]=extra[k]});var f=$('player');if(f&&f.contentWindow)f.contentWindow.postMessage(isAksor?(method==='seek'?{key:'player_seek',value:value.seconds}:{key:method==='play'?'player_play':'player_pause'}):isCvh?value:{key:'kodik_player_api',value:value},playerOrigin)}
+function command(method,extra){if(!isKodik&&!isCvh&&!isAksor)return;var value={method:method};if(extra)Object.keys(extra).forEach(function(k){value[k]=extra[k]});var f=$('player');if(f&&f.contentWindow)f.contentWindow.postMessage(isAksor?(method==='volume'?{key:'player_set_volume',value:{volume:value.volume,muted:value.volume===0}}:method==='seek'?{key:'player_seek',value:value.seconds}:{key:method==='play'?'player_play':'player_pause'}):isCvh?value:{key:'kodik_player_api',value:value},playerOrigin)}
 
 function declaredHeight(video){
   var url=safeUrl(video.iframe_url);
@@ -61,7 +61,7 @@ function addEpisode(list,video){
   }
   list.push(video);
 }
-var cvhRetryTimer, cvhNoticeTimer;
+var cvhRetryTimer, cvhNoticeTimer, remoteVolume=1;
 function stopStartupTimer(){
   clearTimeout(cvhRetryTimer);
 }
@@ -89,9 +89,15 @@ function toggleRemotePlay(){
   if(paused&&isCvhSource()){clearTimeout(cvhRetryTimer);startCvh($('player'),0)}
   else command(paused?'play':'pause');
 }
+function changeRemoteVolume(delta){
+  remoteVolume=Math.max(0,Math.min(1,Math.round((remoteVolume+delta)*10)/10));
+  command('volume',{volume:remoteVolume});
+  $('remoteVolume').textContent=Math.round(remoteVolume*100)+'%';
+}
 function openRemoteControls(){
   var supported=isKodik||isCvh||isAksor;
-  ['remoteSeekBack','remotePlay','remoteSeekForward'].forEach(function(id){$(id).hidden=!supported});
+  ['remoteSeekBack','remotePlay','remoteSeekForward','remoteVolumeDown','remoteVolume','remoteVolumeUp'].forEach(function(id){$(id).hidden=!supported});
+  $('remoteVolume').textContent=Math.round(remoteVolume*100)+'%';
   $('remoteControls').hidden=false;
   $(supported?'remotePlay':'remoteNative').focus();
 }
@@ -131,6 +137,8 @@ $('random').onclick=function(){
 };
 $('back').onclick=back;$('catalog').onclick=function(){if(view==='player')closePlayer();catalogMode='catalog';$('query').value='';catalog(true)};$('searchForm').onsubmit=function(e){e.preventDefault();catalogMode='catalog';catalog(true)};$('more').onclick=function(){catalog(false)};$('exitPlayer').onclick=closePlayer;
 $('cvhSources').onclick=function(){closePlayer();renderPlayers()};
+$('remoteVolumeDown').onclick=function(){changeRemoteVolume(-.1)};
+$('remoteVolumeUp').onclick=function(){changeRemoteVolume(.1)};
 $('remotePlay').onclick=toggleRemotePlay;
 $('remoteSeekBack').onclick=function(){seek(-10)};
 $('remoteSeekForward').onclick=function(){seek(10)};
