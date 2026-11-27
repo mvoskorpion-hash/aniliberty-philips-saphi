@@ -2,6 +2,6 @@ const fs=require('fs');
 const base=(process.env.SITE_URL||'').replace(/\/$/,'');
 if(!/^https:\/\//.test(base))throw Error('SITE_URL must be the HTTPS GitHub Pages URL');
 fs.mkdirSync('web/msx',{recursive:true});
-fs.writeFileSync('web/msx/start.json',JSON.stringify({name:'Аниме',version:'1.0.41',parameter:'content:'+base+'/msx/content.json'},null,2));
-fs.writeFileSync('web/msx/content.json',JSON.stringify({type:'list',headline:'Аниме',template:{type:'separate',layout:'0,0,4,3',color:'msx-glass',imageFiller:'fit',imagePreload:false},items:[{title:'AniLiberty',image:base+'/icon.png',action:'link:'+base+'/?tv=philips&v=112'},{title:'YummyAnime',image:base+'/yummyanime-logo.png',imageFiller:'fit',action:'link:'+base+'/yummy/?v=23'}]},null,2));
+fs.writeFileSync('web/msx/start.json',JSON.stringify({name:'Аниме',version:'1.0.42',parameter:'content:'+base+'/msx/content.json'},null,2));
+fs.writeFileSync('web/msx/content.json',JSON.stringify({type:'list',headline:'Аниме',template:{type:'separate',layout:'0,0,4,3',color:'msx-glass',imageFiller:'fit',imagePreload:false},items:[{title:'AniLiberty',image:base+'/icon.png',action:'link:'+base+'/?tv=philips&v=112'},{title:'YummyAnime',image:base+'/yummyanime-logo.png',imageFiller:'fit',action:'link:'+base+'/yummy/?v=24'}]},null,2));
 console.log('Prepared MSX launcher for '+base);
