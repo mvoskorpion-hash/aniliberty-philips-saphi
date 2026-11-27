@@ -99,15 +99,17 @@ function watchStartup(){
   $('playerState').textContent='Открываем видео…';
   startupTimer=setTimeout(function(){
     showPanel();
-    $('playerState').textContent='Если видео не началось, нажмите «Повторить» или выберите другой источник.';
+    $('playerState').textContent='Плеер не подтвердил запуск. Можно повторить попытку или выбрать другой источник.';
+    if(!isKodik&&document.activeElement!==$('player'))$('changePlayer').focus();
   },12000);
 }
+function preferKodik(a,b){return Number(b.id==='4')-Number(a.id==='4')}
 function chooseEpisodeSource(){
   var episode=String(current.number), previous=chosenPlayer, voice=group.voice;
   closePlayer();
   view='sources';
   resetGrid(release.title+' · серия '+episode);
-  players.forEach(function(player){
+  players.slice().sort(preferKodik).forEach(function(player){
     if(player===previous)return;
     var available=[];
     player.groups.forEach(function(option){
