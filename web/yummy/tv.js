@@ -80,7 +80,7 @@ function play(v){var url=safeUrl(v.iframe_url);if(!url){message('Нет дост
     if(view==='player'&&$('player')===f&&playRequested&&position<1)$('cvhNotice').hidden=false;
   },20000)}
 function closePlayer(){clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;stopStartupTimer();$('frameHolder').textContent='';$('screen').hidden=true;document.body.className='';if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}renderEpisodes();var bs=$('grid').querySelectorAll('button'),i=group.videos.findIndex(function(v){return String(v.number)===String(current.number)});if(bs[i])bs[i].focus()}
-function back(){if(view==='player'){closePlayer();return}if(pending){++requestId;pending.abort();pending=null;busy=false}if(view==='sources'){renderEpisodes();return}if(view==='episodes'){renderVoices();return}if(view==='voices'){renderPlayers();return}if(view==='players'){view='catalog';renderCards();var bs=$('grid').querySelectorAll('button');if(bs[catalogFocus])bs[catalogFocus].focus();return}if(window.history.length>1)window.history.back()}
+function back(){if(view==='player'){closePlayer();return}if(pending){++requestId;pending.abort();pending=null;busy=false}if(view==='sources'){renderEpisodes();return}if(view==='alternatives'){renderEpisodes();return}if(view==='episodes'){renderVoices();return}if(view==='voices'){renderPlayers();return}if(view==='players'){view='catalog';renderCards();var bs=$('grid').querySelectorAll('button');if(bs[catalogFocus])bs[catalogFocus].focus();return}if(window.history.length>1)window.history.back()}
 function toggleRemotePlay(){
   if(paused)startRemotePlay();
   else pauseRemotePlay();
@@ -137,6 +137,30 @@ $('random').onclick=function(){
 };
 $('back').onclick=back;$('catalog').onclick=function(){if(view==='player')closePlayer();catalogMode='catalog';$('query').value='';catalog(true)};$('searchForm').onsubmit=function(e){e.preventDefault();catalogMode='catalog';catalog(true)};$('more').onclick=function(){catalog(false)};$('exitPlayer').onclick=closePlayer;
 $('cvhRetry').onclick=function(){if(view==='player'&&isCvhSource())play(current)};
-$('cvhSources').onclick=function(){closePlayer();renderPlayers()};
+$('cvhSources').onclick=function(){
+  var episode=String(current.number), preferredVoice=group.voice, alternatives=[];
+  players.forEach(function(player){
+    if(player===chosenPlayer)return;
+    player.groups.forEach(function(voice){
+      var video=voice.videos.find(function(v){return String(v.number)===episode});
+      if(video)alternatives.push({player:player,voice:voice,video:video});
+    });
+  });
+  closePlayer();
+  if(!alternatives.length){renderPlayers();message('Эта серия недоступна в других плеерах');return}
+  alternatives.sort(function(a,b){return Number(b.voice.voice===preferredVoice)-Number(a.voice.voice===preferredVoice)});
+  view='alternatives';
+  resetGrid(release.title);
+  $('description').textContent='Серия '+episode;
+  alternatives.forEach(function(option){
+    button(option.player.name.replace(/^Плеер\s+/,'')+' · '+option.voice.voice,function(){
+      chosenPlayer=option.player;
+      group=option.voice;
+      play(option.video);
+    });
+  });
+  message('Выберите другой плеер для этой серии');
+  focusFirst();
+};
 catalog(true);
 })();
