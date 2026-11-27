@@ -83,9 +83,3 @@ header{flex-wrap:wrap}header nav{display:flex;flex-wrap:wrap;gap:10px}@media(max
 #exitPlayer{position:absolute;top:12px;left:12px;z-index:2;min-width:44px;min-height:44px;padding:4px 12px;background:rgba(20,28,43,.8)}
 
 #cvhNotice{position:absolute;z-index:2;left:4%;right:4%;bottom:4%;padding:12px;background:#242225;border-radius:8px}#cvhNotice p{margin:0 0 8px}
-
-
-
-
-
-#qualityNotice{position:absolute;top:12px;right:12px;z-index:2;max-width:72%;margin:0;padding:10px 14px;background:#242225;color:#fff;border-radius:8px;pointer-events:none}
