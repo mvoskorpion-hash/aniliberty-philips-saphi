@@ -38,7 +38,7 @@ function showReleaseDetails(){
   $('releaseCard').hidden=false;
 }
 function renderPlayers(){view='players';resetGrid(release.title);showReleaseDetails();players.forEach(function(p){button(p.name.replace(/^Плеер\s+/,'')+' · озвучек: '+p.groups.length,function(){chosenPlayer=p;group=null;renderVoices()})});message(players.length?'Выберите плеер':'Источник не предоставил доступные серии для этого релиза');focusChoice(players.indexOf(chosenPlayer))}
-function renderVoices(){view='voices';resetGrid(release.title);$('description').textContent=chosenPlayer.name+' → Озвучка';$('grid').className='voice-grid';
+function renderVoices(){view='voices';resetGrid(release.title);$('description').textContent=chosenPlayer.name+' - Озвучка';$('grid').className='voice-grid';
 chosenPlayer.groups.forEach(function(g){
   var choice=button('',function(){group=g;renderEpisodes()},'choice voice-choice');
   var name=document.createElement('span'),count=document.createElement('small');
