@@ -92,7 +92,10 @@ document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagN
 }if(k>=37&&k<=40){
   e.preventDefault();
   if(k===38)($('cvhNotice').hidden?$('exitPlayer'):$('cvhSources')).focus();
-  else if(k===40)$('screen').focus();
+  else if(k===40){
+    if(e.target.tagName==='BUTTON')$('screen').focus();
+    else $('player').focus();
+  }
   else if(e.target!==$('exitPlayer'))seek(k===37?-10:10);
   return;
 }if(k===19){e.preventDefault();clearTimeout(cvhRetryTimer);command('pause');return}if(k===415){e.preventDefault();command('play');return}if(k===412||k===417){e.preventDefault();seek(k===412?-10:10);return}}if(view==='players'&&e.target===$('synopsis')&&(k===38||k===40)){
