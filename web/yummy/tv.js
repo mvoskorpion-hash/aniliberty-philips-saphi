@@ -61,32 +61,63 @@ function addEpisode(list,video){
   }
   list.push(video);
 }
-var cvhRetryTimer, cvhNoticeTimer;
+var playRetryTimer, cvhNoticeTimer, qualityNoticeTimer, resumeAt=0, playRequested=true;
 function stopStartupTimer(){
-  clearTimeout(cvhRetryTimer);
+  clearTimeout(playRetryTimer);
 }
 function isCvhSource(){
   return isCvh&&current&&Number(current.data.player_id)===3;
 }
-function startCvh(frame,attempt){
-  if(frame!==$('player')||view!=='player'||!paused)return;
+function retryPlay(frame,attempt){
+  if(frame!==$('player')||view!=='player'||!playRequested||(attempt>0&&!paused))return;
   command('play');
-  if(attempt<4)cvhRetryTimer=setTimeout(function(){startCvh(frame,attempt+1)},1500);
+  if(attempt<4)playRetryTimer=setTimeout(function(){retryPlay(frame,attempt+1)},1500);
 }
-function play(v){var url=safeUrl(v.iframe_url);if(!url){message('Нет доступной ссылки плеера');return}current=v;view='player';stopStartupTimer();position=0;duration=0;paused=true;playerOrigin=origin(url);isKodik=/^https:\/\/(?:[a-z0-9-]+\.)?(?:kodikplayer\.com|kodik\.info|kodik\.biz)$/.test(playerOrigin);isCvh=(Number(v.data&&v.data.player_id)===3||Number(v.data&&v.data.player_id)===8)&&playerOrigin==='https://ru.yummyani.me';isAksor=Number(v.data&&v.data.player_id)===1&&playerOrigin==='https://player.aksor.tv';$('frameHolder').textContent='';var f=document.createElement('iframe');f.id='player';f.title='Видео';f.tabIndex=0;f.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');f.src=url;f.onload=function(){if(f!==$('player'))return;if(isCvhSource())startCvh(f,0);else if(isKodik||isCvh||isAksor)command('play')};$('frameHolder').appendChild(f);$('screen').hidden=false;document.body.className='playing';$('screen').focus();
+function play(v,resume){var url=safeUrl(v.iframe_url);if(!url){message('Нет доступной ссылки плеера');return}current=v;view='player';stopStartupTimer();clearTimeout(cvhNoticeTimer);resumeAt=resume||0;playRequested=true;position=0;duration=0;paused=true;playerOrigin=origin(url);isKodik=/^https:\/\/(?:[a-z0-9-]+\.)?(?:kodikplayer\.com|kodik\.info|kodik\.biz)$/.test(playerOrigin);isCvh=(Number(v.data&&v.data.player_id)===3||Number(v.data&&v.data.player_id)===8)&&playerOrigin==='https://ru.yummyani.me';isAksor=Number(v.data&&v.data.player_id)===1&&playerOrigin==='https://player.aksor.tv';$('frameHolder').textContent='';var f=document.createElement('iframe');f.id='player';f.title='Видео';f.tabIndex=0;f.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');f.src=url;f.onload=function(){if(f!==$('player'))return;if(playRequested&&(isKodik||isCvh||isAksor))startRemotePlay()};$('frameHolder').appendChild(f);$('screen').hidden=false;document.body.className='playing';$('screen').focus();
   $('cvhNotice').hidden=true;
   if(isCvhSource())cvhNoticeTimer=setTimeout(function(){
     if(view==='player'&&$('player')===f&&position<1)$('cvhNotice').hidden=false;
   },20000)}
-function closePlayer(){clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;stopStartupTimer();$('frameHolder').textContent='';$('screen').hidden=true;document.body.className='';if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}renderEpisodes();var bs=$('grid').querySelectorAll('button'),i=group.videos.indexOf(current);if(bs[i])bs[i].focus()}
+function closePlayer(){clearTimeout(qualityNoticeTimer);$('qualityNotice').hidden=true;clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;stopStartupTimer();$('frameHolder').textContent='';$('screen').hidden=true;document.body.className='';if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}renderEpisodes();var bs=$('grid').querySelectorAll('button'),i=group.videos.findIndex(function(v){return String(v.number)===String(current.number)});if(bs[i])bs[i].focus()}
 function back(){if(view==='player'){closePlayer();return}if(pending){++requestId;pending.abort();pending=null;busy=false}if(view==='sources'){renderEpisodes();return}if(view==='episodes'){renderVoices();return}if(view==='voices'){renderPlayers();return}if(view==='players'){view='catalog';renderCards();var bs=$('grid').querySelectorAll('button');if(bs[catalogFocus])bs[catalogFocus].focus();return}if(window.history.length>1)window.history.back()}
 function toggleRemotePlay(){
-  if(paused&&isCvhSource()){clearTimeout(cvhRetryTimer);startCvh($('player'),0)}
-  else command(paused?'play':'pause');
+  if(paused)startRemotePlay();
+  else pauseRemotePlay();
+}
+function startRemotePlay(){
+  playRequested=true;
+  stopStartupTimer();
+  retryPlay($('player'),0);
+}
+function pauseRemotePlay(){
+  playRequested=false;
+  stopStartupTimer();
+  command('pause');
+}
+function raiseQuality(){
+  var height=declaredHeight(current), best=current;
+  if(height)videos.forEach(function(v){
+    var a=v.data||{}, b=current.data||{};
+    if(String(v.number)===String(current.number)&&a.player_id===b.player_id&&a.player===b.player&&a.dubbing===b.dubbing&&declaredHeight(v)>declaredHeight(best))best=v;
+  });
+  var notice=$('qualityNotice');
+  if(best!==current){
+    play(best,position);
+    notice.textContent='Источник '+declaredHeight(best)+'p';
+  }else if(height){
+    notice.textContent='Более высокого качества в каталоге нет. Проверьте настройки самого плеера.';
+  }else{
+    notice.textContent='Качество можно изменить в настройках самого плеера, если они доступны.';
+  }
+  notice.hidden=false;
+  clearTimeout(qualityNoticeTimer);
+  qualityNoticeTimer=setTimeout(function(){notice.hidden=true},3000);
 }
 function seek(delta){command('seek',{seconds:Math.max(0,duration?Math.min(duration,position+delta):position+delta)})}
 function move(key){var root=document,all=root.querySelectorAll('button,input,#synopsis'),list=[],active=document.activeElement,i;for(i=0;i<all.length;i++)if(!all[i].disabled&&all[i].offsetWidth>0&&all[i].offsetHeight>0)list.push(all[i]);if(!list.length)return;var a=active&&active.getBoundingClientRect(),best=null,score=Infinity;if(a&&list.indexOf(active)>=0){var ax=a.left+a.width/2,ay=a.top+a.height/2;list.forEach(function(b){if(b===active)return;var r=b.getBoundingClientRect(),dx=r.left+r.width/2-ax,dy=r.top+r.height/2-ay,primary=(key===37?-dx:key===39?dx:key===38?-dy:dy),cross=(key===37||key===39)?Math.abs(dy):Math.abs(dx);if(primary<5)return;var s=primary+cross*3;if(s<score){score=s;best=b}})}else best=list[0];if(best){best.focus();if(view!=='player')best.scrollIntoView({block:'nearest'})}}
-document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagName==='INPUT'){if(k===40){e.preventDefault();focusFirst()}else if(k===27||k===461){e.preventDefault();$('catalog').focus()}return}if(k===8||k===27||k===461||k===10009){e.preventDefault();back();return}if(view==='player'){if(k===13&&e.target.tagName!=='BUTTON'){
+document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagName==='INPUT'){if(k===40){e.preventDefault();focusFirst()}else if(k===27||k===461){e.preventDefault();$('catalog').focus()}return}if(k===8||k===27||k===461||k===10009){e.preventDefault();back();return}if(view==='player'){
+  if(k===406||e.key==='ColorF3Blue'||e.key==='Blue'){e.preventDefault();if(!e.repeat)raiseQuality();return}
+  if(k===13&&e.target.tagName!=='BUTTON'){
   e.preventDefault();
   if(isKodik||isCvh||isAksor){
     toggleRemotePlay();
@@ -98,12 +129,23 @@ document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagN
   else if(k===40)$('player').focus();
   else if(e.target!==$('exitPlayer'))seek(k===37?-10:10);
   return;
-}if(k===19){e.preventDefault();clearTimeout(cvhRetryTimer);command('pause');return}if(k===415){e.preventDefault();command('play');return}if(k===412||k===417){e.preventDefault();seek(k===412?-10:10);return}}if(view==='players'&&e.target===$('synopsis')&&(k===38||k===40)){
+}if(k===19||k===413||e.key==='Pause'||e.key==='MediaPause'||e.key==='MediaStop'){
+  e.preventDefault();pauseRemotePlay();return
+}
+if(k===415||k===179||k===10252||e.key==='MediaPlay'||e.key==='MediaPlayPause'){
+  if(!isKodik&&!isCvh&&!isAksor){$('player').focus();return}
+  e.preventDefault();
+  if(!e.repeat){
+    if(k===179||k===10252||e.key==='MediaPlayPause')toggleRemotePlay();
+    else startRemotePlay();
+  }
+  return;
+}if(k===412||k===417){e.preventDefault();seek(k===412?-10:10);return}}if(view==='players'&&e.target===$('synopsis')&&(k===38||k===40)){
   var synopsis=e.target;
   var canScroll=k===38?synopsis.scrollTop>0:synopsis.scrollTop+synopsis.clientHeight<synopsis.scrollHeight-1;
   if(canScroll){e.preventDefault();synopsis.scrollTop+=(k===38?-1:1)*Math.max(36,Math.floor(synopsis.clientHeight*.65));return}
 }if(k>=37&&k<=40){e.preventDefault();move(k)}else if(k===13&&e.target.tagName==='BUTTON'){e.preventDefault();e.target.click()}});
-window.addEventListener('message',function(e){var f=$('player');if(!f||e.source!==f.contentWindow||e.origin!==playerOrigin||!e.data||typeof e.data!=='object')return;var d=e.data;if((isCvh||isAksor)&&typeof d.key==='string'&&d.key.indexOf('player_')===0)d={key:'kodik_'+d.key,value:d.value};if(d.key==='kodik_player_time_update'&&typeof d.value==='number'){position=d.value;if(position>=1){clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;}}else if(d.key==='kodik_player_duration_update'&&typeof d.value==='number')duration=d.value;else if(d.key==='kodik_player_play'||d.key==='kodik_player_video_started'){stopStartupTimer();paused=false}else if(d.key==='kodik_player_pause'){paused=true}});
+window.addEventListener('message',function(e){var f=$('player');if(!f||e.source!==f.contentWindow||e.origin!==playerOrigin||!e.data||typeof e.data!=='object')return;var d=e.data;if((isCvh||isAksor)&&typeof d.key==='string'&&d.key.indexOf('player_')===0)d={key:'kodik_'+d.key,value:d.value};if(d.key==='kodik_player_time_update'&&typeof d.value==='number'){position=d.value;if(position>0){stopStartupTimer();paused=false;if(resumeAt){var target=resumeAt;resumeAt=0;command('seek',{seconds:target})}}if(position>=1){clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;}}else if(d.key==='kodik_player_duration_update'&&typeof d.value==='number')duration=d.value;else if(d.key==='kodik_player_play'||d.key==='kodik_player_video_started'){stopStartupTimer();paused=false}else if(d.key==='kodik_player_pause'){paused=true}});
 $('top').onclick=function(){catalogMode='top';$('query').value='';catalog(true)};
 $('random').onclick=function(){
   request('/anime?limit=1&sort=random',function(list){
