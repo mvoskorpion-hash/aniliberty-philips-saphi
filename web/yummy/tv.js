@@ -71,12 +71,13 @@ function isCvhSource(){
 function retryPlay(frame,attempt){
   if(frame!==$('player')||view!=='player'||!playRequested||(attempt>0&&!paused))return;
   command('play');
-  if(attempt<4)playRetryTimer=setTimeout(function(){retryPlay(frame,attempt+1)},1500);
+  var maxRetries=isCvhSource()?12:4;
+  if(attempt<maxRetries)playRetryTimer=setTimeout(function(){retryPlay(frame,attempt+1)},1500);
 }
 function play(v){var url=safeUrl(v.iframe_url);if(!url){message('Нет доступной ссылки плеера');return}current=v;view='player';stopStartupTimer();clearTimeout(cvhNoticeTimer);playRequested=true;position=0;duration=0;paused=true;playerOrigin=origin(url);isKodik=/^https:\/\/(?:[a-z0-9-]+\.)?(?:kodikplayer\.com|kodik\.info|kodik\.biz)$/.test(playerOrigin);isCvh=(Number(v.data&&v.data.player_id)===3||Number(v.data&&v.data.player_id)===8)&&playerOrigin==='https://ru.yummyani.me';isAksor=Number(v.data&&v.data.player_id)===1&&playerOrigin==='https://player.aksor.tv';$('frameHolder').textContent='';var f=document.createElement('iframe');f.id='player';f.title='Видео';f.tabIndex=0;f.setAttribute('allow','autoplay; fullscreen; encrypted-media; picture-in-picture');f.setAttribute('allowfullscreen','');f.src=url;f.onload=function(){if(f!==$('player'))return;if(playRequested&&(isKodik||isCvh||isAksor))startRemotePlay()};$('frameHolder').appendChild(f);$('screen').hidden=false;document.body.className='playing';$('screen').focus();
   $('cvhNotice').hidden=true;
   if(isCvhSource())cvhNoticeTimer=setTimeout(function(){
-    if(view==='player'&&$('player')===f&&position<1)$('cvhNotice').hidden=false;
+    if(view==='player'&&$('player')===f&&playRequested&&position<1)$('cvhNotice').hidden=false;
   },20000)}
 function closePlayer(){clearTimeout(cvhNoticeTimer);$('cvhNotice').hidden=true;stopStartupTimer();$('frameHolder').textContent='';$('screen').hidden=true;document.body.className='';if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}renderEpisodes();var bs=$('grid').querySelectorAll('button'),i=group.videos.findIndex(function(v){return String(v.number)===String(current.number)});if(bs[i])bs[i].focus()}
 function back(){if(view==='player'){closePlayer();return}if(pending){++requestId;pending.abort();pending=null;busy=false}if(view==='sources'){renderEpisodes();return}if(view==='episodes'){renderVoices();return}if(view==='voices'){renderPlayers();return}if(view==='players'){view='catalog';renderCards();var bs=$('grid').querySelectorAll('button');if(bs[catalogFocus])bs[catalogFocus].focus();return}if(window.history.length>1)window.history.back()}
@@ -105,8 +106,9 @@ document.addEventListener('keydown',function(e){var k=e.keyCode;if(e.target.tagN
   return;
 }if(k>=37&&k<=40){
   e.preventDefault();
-  if(k===38)($('cvhNotice').hidden?$('exitPlayer'):$('cvhSources')).focus();
+  if(k===38)($('cvhNotice').hidden?$('exitPlayer'):$('cvhRetry')).focus();
   else if(k===40)$('player').focus();
+  else if(!$('cvhNotice').hidden&&(e.target===$('cvhRetry')||e.target===$('cvhSources')))(k===37?$('cvhRetry'):$('cvhSources')).focus();
   else if(e.target!==$('exitPlayer'))seek(k===37?-10:10);
   return;
 }if(k===19||k===413||e.key==='Pause'||e.key==='MediaPause'||e.key==='MediaStop'){
@@ -134,6 +136,7 @@ $('random').onclick=function(){
   });
 };
 $('back').onclick=back;$('catalog').onclick=function(){if(view==='player')closePlayer();catalogMode='catalog';$('query').value='';catalog(true)};$('searchForm').onsubmit=function(e){e.preventDefault();catalogMode='catalog';catalog(true)};$('more').onclick=function(){catalog(false)};$('exitPlayer').onclick=closePlayer;
+$('cvhRetry').onclick=function(){if(view==='player'&&isCvhSource())play(current)};
 $('cvhSources').onclick=function(){closePlayer();renderPlayers()};
 catalog(true);
 })();
